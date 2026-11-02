@@ -26,8 +26,7 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Cache-first für die App-Shell, Netzwerk-Fallback für alles andere (z.B. Google Fonts),
-// mit Cache-Update im Hintergrund, damit die App auch offline vollständig startet.
+// Cache-first, Netzwerk-Fallback; Cache wird im Hintergrund aktualisiert.
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
