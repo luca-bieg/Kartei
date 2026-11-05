@@ -10,7 +10,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Kartei">
-<meta name="theme-color" content="#12161c">
+<meta name="theme-color" content="#21232E">
 <meta name="format-detection" content="telephone=no">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
@@ -21,14 +21,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #12161c;
-    --panel: #1b212a;
-    --panel-2: #212a35;
-    --border: #2b3441;
-    --text: #ece9e2;
-    --text-muted: #8b94a3;
-    --accent: #e63946;
-    --accent-soft: rgba(230,57,70,0.14);
+    --bg: #21232E;
+    --panel: #2a2e3f;
+    --panel-2: #323850;
+    --border: #434a68;
+    --text: #f4f6fb;
+    --text-muted: #a6aec6;
+    --blue: #105BFF;
+    --blue-soft: rgba(16,91,255,0.18);
+    --accent: #FE7402;
+    --accent-soft: rgba(254,116,2,0.15);
     --radius: 10px;
   }
   *{box-sizing:border-box;}
@@ -74,6 +76,8 @@
     transition:all .15s ease; white-space:nowrap;
   }
   .io-btn:hover{ color:var(--text); border-color:var(--text-muted); }
+  .io-btn.danger{ color:#e5606b; border-color:rgba(229,96,107,.45); }
+  .io-btn.danger:hover{ color:#fff; background:#c93a46; border-color:#c93a46; }
 
   .mode-toggle{ display:flex; gap:6px; margin-bottom:6px; }
   .mode-btn{
@@ -81,8 +85,19 @@
     color:var(--text-muted); font-family:'IBM Plex Sans', sans-serif; font-size:12px; font-weight:500;
     padding:7px 8px; cursor:pointer; transition:all .15s ease;
   }
-  .mode-btn.active{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  .mode-btn.active{ background:var(--blue); color:#fff; border-color:var(--blue); }
   .mode-btn:not(.active):hover{ color:var(--text); }
+
+  .season-picker-popup{
+    position:fixed; z-index:500; background:var(--panel-2); border:1px solid var(--border);
+    border-radius:8px; padding:5px; display:flex; flex-direction:column; gap:3px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.45); min-width:170px;
+  }
+  .season-picker-option{
+    background:transparent; border:none; color:var(--text); font-family:'IBM Plex Sans', sans-serif;
+    font-size:13px; padding:8px 10px; text-align:left; border-radius:6px; cursor:pointer; white-space:nowrap;
+  }
+  .season-picker-option:hover{ background:var(--blue); color:#fff; }
 
   .liveticker-btn{
     display:flex; align-items:center; gap:6px; background:var(--accent-soft); border:1px solid var(--accent);
@@ -99,7 +114,7 @@
     background:transparent; color:var(--text-muted); border:none; padding:9px 16px;
     border-radius:999px; cursor:pointer; transition:all .15s ease; white-space:nowrap;
   }
-  .tab.active{ background:var(--accent); color:#fff; }
+  .tab.active{ background:var(--blue); color:#fff; }
   .tab:not(.active):hover{ color:var(--text); }
 
   .mode-switch{ display:flex; background:var(--panel-2); border:1px solid var(--border); border-radius:999px; padding:3px; gap:2px; margin-bottom:14px; width:fit-content; }
@@ -108,7 +123,7 @@
     background:transparent; color:var(--text-muted); border:none; padding:8px 18px; border-radius:999px;
     cursor:pointer; transition:all .15s ease;
   }
-  .mode-switch-btn.active{ background:var(--accent); color:#fff; }
+  .mode-switch-btn.active{ background:var(--blue); color:#fff; }
   .mode-switch-btn:not(.active):hover{ color:var(--text); }
 
   main{ position:relative; }
@@ -135,7 +150,7 @@
   textarea.remarks-field{ min-height:60px; }
   .custom-team-input{ margin-top:6px; }
   button[type=submit]{
-    margin-top:4px; background:var(--accent); color:#fff; border:none; border-radius:7px;
+    margin-top:4px; background:var(--blue); color:#fff; border:none; border-radius:7px;
     padding:11px; font-size:13.5px; font-weight:600; letter-spacing:0.02em; cursor:pointer;
     font-family:'IBM Plex Sans', sans-serif; transition:filter .15s ease;
   }
@@ -196,6 +211,12 @@
     font-family:'IBM Plex Sans', sans-serif; font-size:13px; font-weight:600; padding:11px 16px; cursor:pointer;
   }
   .form-cancel-btn:hover{ color:var(--text); }
+  .quick-action-btn{ margin-top:8px; background:var(--panel-2); border:1px dashed var(--border); color:var(--text-muted); border-radius:7px; padding:9px; font-size:12.5px; cursor:pointer; font-weight:600; width:100%; }
+  .quick-action-btn:hover{ border-color:var(--accent); color:var(--text); }
+  .qs-player-list{ display:flex; flex-direction:column; gap:6px; margin-top:4px; }
+  .qs-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; background:var(--panel-2); border:1px solid var(--border); border-radius:7px; padding:7px 10px; }
+  .qs-player-name{ font-size:12.5px; font-weight:600; color:var(--text); }
+  .qs-value-input{ width:70px; flex-shrink:0; padding:6px 8px; text-align:center; }
   .editing-banner{
     font-size:11.5px; color:var(--accent); background:var(--accent-soft); border-radius:6px;
     padding:6px 10px; margin-top:-6px;
@@ -226,7 +247,7 @@
     font-family:'IBM Plex Mono', monospace; font-size:12px; background:var(--panel); color:var(--text-muted);
     border:1px solid var(--border); padding:6px 13px; border-radius:999px; cursor:pointer; transition:all .15s ease;
   }
-  .chip.active{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  .chip.active{ background:var(--blue); color:#fff; border-color:var(--blue); }
   .chip:not(.active):hover{ color:var(--text); border-color:var(--text-muted); }
 
   .results{ display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:12px; align-items:start; }
@@ -259,6 +280,11 @@
   .setup-card h1{ font-family:'Oswald', sans-serif; font-weight:600; font-size:22px; letter-spacing:0.04em; text-transform:uppercase; margin:0 0 6px; }
   .setup-sub{ color:var(--text-muted); font-size:13px; margin:0 0 22px; line-height:1.5; }
   .setup-card form{ background:none; border:none; padding:0; text-align:left; }
+  .league-switch{ display:flex; gap:6px; margin:0 0 16px; background:var(--panel-2); border:1px solid var(--border); border-radius:10px; padding:4px; }
+  .league-btn{ flex:1; border:none; background:transparent; color:var(--text-muted); font-family:'Oswald', sans-serif; font-size:14px; letter-spacing:0.05em; text-transform:uppercase; padding:10px 8px; border-radius:7px; cursor:pointer; min-height:44px; }
+  .league-btn.active{ background:var(--blue); color:#fff; }
+  .setup-card select{ width:100%; }
+  .setup-card .custom-team-input{ margin-top:8px; }
 
   /* ---- Matchday page ---- */
   .officials-grid{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:14px; }
@@ -283,6 +309,10 @@
   .remove-img-btn:hover{ color:var(--accent); }
 
   .matchday-actions{ display:flex; align-items:center; gap:14px; margin-top:2px; }
+  .qp-head{ display:flex; justify-content:flex-end; gap:4px; font-family:'IBM Plex Mono', monospace; font-size:10px; text-transform:uppercase; color:var(--text-muted); margin:2px 10px -2px; }
+  .qp-head span{ width:48px; text-align:center; }
+  .qp-inputs{ display:flex; gap:4px; flex-shrink:0; }
+  .qp-inputs input{ width:48px; padding:6px 4px; text-align:center; }
   .save-status{ font-size:12px; color:var(--accent); opacity:0; transition:opacity .3s ease; }
 
   /* ---- Analyse ---- */
@@ -295,7 +325,7 @@
   .analysis-label{ font-family:'IBM Plex Mono', monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); display:block; margin-bottom:4px; }
   .analysis-value{ font-size:13px; color:var(--text); line-height:1.5; white-space:pre-wrap; }
   .analysis-value.empty-value{ color:var(--text-muted); font-style:italic; }
-  .analysis-value.diff-positive{ color:#2ac6b3; font-weight:600; }
+  .analysis-value.diff-positive{ color:#6aa0ff; font-weight:600; }
   .analysis-value.diff-negative{ color:var(--accent); font-weight:600; }
 
   .chip-multiselect{ display:flex; flex-wrap:wrap; gap:8px; }
@@ -305,18 +335,18 @@
     transition:all .15s ease;
   }
   .chip-select-btn:hover:not(.selected){ color:var(--text); border-color:var(--text-muted); }
-  .chip-select-btn.selected{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  .chip-select-btn.selected{ background:var(--blue); color:#fff; border-color:var(--blue); }
   .chip-select-count{ font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--text-muted); margin-top:2px; }
   .chip-select-count.ok{ color:var(--accent); }
 
   .goal-diff-display{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--text-muted); margin-top:-4px; display:flex; align-items:center; gap:6px; }
   .goal-diff-display b{ font-size:13.5px; color:var(--text); font-weight:600; }
-  .goal-diff-display.positive b{ color:#2ac6b3; }
+  .goal-diff-display.positive b{ color:#6aa0ff; }
   .goal-diff-display.negative b{ color:var(--accent); }
 
   .status-fraglich{ color:#f4d488; background:rgba(244,212,136,0.14); }
   .status-verletzt{ color:#f35561; background:rgba(243,85,97,0.14); }
-  .status-gesperrt{ color:#a1a9b6; background:rgba(161,169,182,0.18); }
+  .status-gesperrt{ color:#a6aec6; background:rgba(166,174,198,0.18); }
   .status-badge{ display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.05em; padding:2px 8px; border-radius:5px; font-weight:600; white-space:nowrap; margin-top:6px; }
   .p-status{ font-family:'IBM Plex Mono', monospace; font-size:9.5px; text-transform:uppercase; letter-spacing:0.03em; padding:1px 6px; border-radius:4px; margin-left:6px; font-weight:600; }
 
@@ -396,7 +426,7 @@
   @media (max-width:720px){ .dashboard-grid{ grid-template-columns:1fr; } }
   .dashboard-subview{ display:none; }
   .dashboard-subview.active{ display:block; }
-  .dash-subtabs{ max-width:400px; margin-bottom:18px; }
+  .dash-subtabs{ max-width:480px; margin-bottom:18px; }
 
   .dashboard-photos-grid{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:20px; }
   @media (max-width:720px){ .dashboard-photos-grid{ grid-template-columns:1fr; } }
@@ -412,6 +442,7 @@
   .lightbox-img{ max-width:95vw; max-height:92vh; border-radius:8px; box-shadow:0 20px 60px rgba(0,0,0,0.5); }
   .dashboard-col{ background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:18px; }
   .dashboard-col h2{ font-family:'Oswald', sans-serif; font-size:16px; text-transform:uppercase; letter-spacing:0.05em; margin:0 0 14px; color:var(--text); font-weight:600; }
+  .dashboard-col h2.dashboard-subhead{ font-size:12.5px; color:var(--text-muted); margin-top:18px; padding-top:16px; border-top:1px solid var(--border); }
   .dashboard-player-list{ display:flex; flex-direction:column; gap:8px; }
   .player-card{
     display:flex; align-items:center; gap:12px; background:var(--panel-2); border:1px solid var(--border);
@@ -419,6 +450,12 @@
     font-family:'IBM Plex Sans', sans-serif; color:var(--text);
   }
   .player-card:hover{ border-color:var(--accent); transform:translateX(2px); }
+  .player-card.kn-selected{ border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-soft), 0 0 0 3px var(--accent); transform:translateX(2px); }
+  .kn-help-box{ max-width:460px; text-align:left; max-height:88vh; overflow-y:auto; }
+  .kn-help-box h3{ font-family:'Oswald', sans-serif; font-size:19px; text-transform:uppercase; letter-spacing:0.03em; margin:0 0 10px; }
+  .kn-help-box h4{ font-size:11.5px; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); margin:14px 0 6px; }
+  .kn-help-row{ display:flex; gap:12px; align-items:baseline; font-size:13px; line-height:1.7; }
+  .kn-help-row kbd{ font-family:'IBM Plex Mono', monospace; font-size:12px; min-width:64px; padding:1px 8px; border-radius:6px; background:var(--panel-2); border:1px solid var(--border); color:var(--accent); text-align:center; flex:0 0 auto; }
   .player-card .p-number{
     font-family:'IBM Plex Mono', monospace; font-weight:600; font-size:15px; color:var(--accent);
     background:var(--accent-soft); width:32px; height:32px; border-radius:50%; display:flex;
@@ -441,7 +478,7 @@
   .player-detail-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
   .pdl-item{ text-align:center; }
   .pdl-label{ display:block; font-size:10px; color:var(--text-muted); margin-bottom:2px; }
-  .pdl-value{ font-family:'IBM Plex Mono', monospace; font-weight:700; font-size:18px; color:#2ac6b3; }
+  .pdl-value{ font-family:'IBM Plex Mono', monospace; font-weight:700; font-size:18px; color:#6aa0ff; }
   .player-detail-stat{ background:var(--panel-2); border:1px solid var(--border); border-radius:7px; padding:8px 10px; }
   .player-detail-stat .pd-label{ font-family:'IBM Plex Mono', monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); display:block; margin-bottom:2px; }
   .player-detail-stat .pd-value{ font-size:14px; font-weight:600; }
@@ -450,16 +487,52 @@
     background:var(--panel-2); border:1px solid var(--border); border-left-width:3px;
     border-left-color:var(--tag-color, var(--border)); border-radius:7px; padding:8px 10px;
     font-size:12.5px; width:100%; text-align:left; cursor:pointer; transition:all .15s ease;
-    font-family:'IBM Plex Sans', sans-serif;
+    font-family:'IBM Plex Sans', sans-serif; position:relative;
   }
   .player-detail-related .related-item:hover{ border-color:var(--accent); transform:translateX(2px); }
   .player-detail-related .related-cat{ font-family:'IBM Plex Mono', monospace; font-size:9.5px; text-transform:uppercase; color:var(--accent); letter-spacing:0.05em; }
   .player-detail-related .related-body{ color:var(--text-muted); margin-top:2px; line-height:1.4; max-height:2.8em; overflow:hidden; text-overflow:ellipsis; }
   .player-detail-related .related-remarks{ color:var(--text-muted); font-style:italic; margin-top:4px; padding-top:4px; border-top:1px solid var(--border); font-size:11.5px; line-height:1.4; }
   .player-detail-empty{ font-size:12.5px; color:var(--text-muted); font-style:italic; margin-bottom:16px; }
+  .related-hide-btn{
+    position:absolute; top:5px; right:5px; width:18px; height:18px; border-radius:50%;
+    background:var(--panel); border:1px solid var(--border); color:var(--text-muted);
+    font-size:10.5px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    padding:0; opacity:0.55; transition:all .15s ease; z-index:2;
+  }
+  .related-hide-btn:hover{ opacity:1; background:var(--accent); color:#fff; border-color:var(--accent); }
+  .related-item.is-hidden{ opacity:0.55; }
+  .hidden-entries-toggle{ grid-column:1 / -1; margin-top:2px; }
+  .hidden-entries-toggle summary{ cursor:pointer; font-size:11.5px; color:var(--text-muted); list-style:none; padding:4px 0; }
+  .hidden-entries-toggle summary::-webkit-details-marker{ display:none; }
+  .hidden-entries-toggle summary:hover{ color:var(--text); }
+  .hidden-entries-list{ display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:8px; margin-top:8px; }
 
   .related-full-box{ max-width:440px; text-align:left; border-left-width:4px; border-left-color:var(--tag-color, var(--accent)); }
   .related-full-title{ font-family:'Oswald', sans-serif; font-size:19px; text-transform:uppercase; letter-spacing:0.03em; margin:0 0 8px; }
+
+  /* ---- Spieler-Import ---- */
+  .pimp-actions{ display:flex; gap:8px; flex-wrap:wrap; }
+  .confirm-box.pimp-box{ max-width:760px; text-align:left; max-height:88vh; overflow-y:auto; }
+  .pimp-box h3{ font-family:'Oswald', sans-serif; font-size:19px; text-transform:uppercase; letter-spacing:0.03em; margin:0 0 6px; }
+  .pimp-sub{ font-size:12.5px; color:var(--text-muted); margin:0 0 14px !important; line-height:1.5; }
+  .pimp-map{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.3fr); gap:8px 12px; align-items:center; margin-bottom:14px; }
+  .pimp-map .pimp-team{ font-size:13px; overflow-wrap:anywhere; }
+  .pimp-map .pimp-team small{ color:var(--text-muted); font-family:'IBM Plex Mono', monospace; font-size:11px; }
+  .pimp-check{ display:flex; flex-direction:row; gap:10px; align-items:flex-start; font-size:13px; line-height:1.45; margin:0 0 14px; cursor:pointer; }
+  .pimp-check input{ width:auto; margin-top:3px; flex:0 0 auto; }
+  .pimp-summary{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+  .pimp-chip{ font-family:'IBM Plex Mono', monospace; font-size:12px; padding:4px 10px; border-radius:999px; border:1px solid var(--border); background:var(--panel-2); color:var(--text-muted); }
+  .pimp-chip b{ color:var(--text); }
+  .pimp-chip.new b{ color:#6aa0ff; }
+  .pimp-chip.upd b{ color:#fdb880; }
+  .pimp-chip.err b{ color:var(--accent); }
+  .pimp-detail{ border:1px solid var(--border); border-radius:8px; margin-bottom:8px; background:var(--panel-2); }
+  .pimp-detail summary{ cursor:pointer; padding:9px 12px; font-size:13px; font-weight:600; }
+  .pimp-detail ul{ margin:0; padding:0 12px 10px 30px; font-size:12.5px; line-height:1.6; color:var(--text-muted); max-height:240px; overflow:auto; }
+  .pimp-detail li b{ color:var(--text); font-weight:600; }
+  .pimp-old{ text-decoration:line-through; opacity:0.7; }
+  .pimp-ok-btn:disabled{ opacity:0.4; cursor:not-allowed; }
 
   /* ---- Confirm modal ---- */
   .confirm-overlay{
@@ -475,7 +548,7 @@
   .confirm-actions button{ font-family:'IBM Plex Sans', sans-serif; font-size:13px; font-weight:600; border-radius:7px; padding:9px 16px; cursor:pointer; border:none; }
   .confirm-cancel-btn{ background:var(--panel-2); color:var(--text-muted); border:1px solid var(--border) !important; }
   .confirm-cancel-btn:hover{ color:var(--text); }
-  .confirm-ok-btn{ background:var(--accent); color:#fff; }
+  .confirm-ok-btn{ background:var(--blue); color:#fff; }
   .confirm-ok-btn:hover{ filter:brightness(1.1); }
 
   /* ---- Toast ---- */
@@ -486,9 +559,146 @@
     box-shadow:0 8px 24px rgba(0,0,0,0.35);
   }
   .toast.toast-error{ border-left-color:var(--accent); }
+
+  /* ---------- Zugangssperre ---------- */
+  body.locked > *:not(#lock-screen){ display:none !important; }
+  #lock-screen{ display:none; }
+  body.locked #lock-screen{
+    display:flex; position:fixed; inset:0; z-index:99999; align-items:center; justify-content:center;
+    background:var(--bg); padding:20px;
+  }
+  #lock-screen form.lock-card{
+    width:100%; max-width:340px; background:var(--panel); border:1px solid var(--border);
+    border-radius:var(--radius); padding:28px 24px; text-align:center;
+    display:block; gap:0; align-self:center; min-width:0;
+  }
+  .lock-card .lock-mark{ color:var(--accent); font-size:22px; margin-bottom:6px; }
+  .lock-card h1{ font-family:'Oswald', sans-serif; font-weight:600; font-size:26px; margin:0 0 4px; letter-spacing:0.02em; }
+  .lock-card p{ color:var(--text-muted); font-size:13.5px; margin:0 0 18px; }
+  .lock-card input{
+    width:100%; box-sizing:border-box; background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+    border-radius:8px; padding:12px 14px; font-size:22px; text-align:center; letter-spacing:0.35em;
+    font-family:'IBM Plex Mono', monospace; outline:none;
+  }
+  .lock-card input:focus{ border-color:var(--accent); }
+  .lock-card button{
+    width:100%; margin-top:12px; background:var(--blue); color:#fff; border:0; border-radius:8px;
+    padding:12px; font-size:15px; font-weight:600; cursor:pointer; font-family:inherit;
+  }
+  .lock-card button:disabled{ opacity:0.5; cursor:default; }
+  .lock-error{ color:var(--accent); font-size:13px; min-height:18px; margin-top:10px; }
+  .lock-card.shake{ animation:lockshake 0.35s; }
+  @keyframes lockshake{ 0%,100%{transform:translateX(0);} 25%{transform:translateX(-8px);} 75%{transform:translateX(8px);} }
 </style>
 </head>
 <body>
+
+<div id="lock-screen">
+  <form class="lock-card" id="lock-form" autocomplete="off">
+    <div class="lock-mark">●</div>
+    <h1>Kartei</h1>
+    <p>Bitte Zugangscode eingeben.</p>
+    <input id="lock-input" type="password" inputmode="numeric" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Zugangscode">
+    <button type="submit" id="lock-submit">Entsperren</button>
+    <div class="lock-error" id="lock-error" role="alert"></div>
+  </form>
+</div>
+<script>
+/* Zugangssperre: Sichtschutz, kein echter Schutz. Der Code steckt als Hash in dieser Datei.
+   Zum Ändern: neuen Hash = SHA-256 von "kartei-sperre-v1|<neuer Code>" unten bei LOCK_HASH eintragen. */
+(function(){
+  var LOCK_HASH = '4a5c08c28c3172a1606854c23af2bbe03c41ddce88b15236b0afa65ca8541a0f';
+  var LOCK_SALT = 'kartei-sperre-v1|';
+  var LOCK_KEY  = 'kartei_unlocked';
+
+  function sha256(ascii){
+    function rr(v, a){ return (v >>> a) | (v << (32 - a)); }
+    var maxWord = Math.pow(2, 32), result = '', i, j;
+    var words = [], asciiBitLength = ascii.length * 8;
+    var hash = sha256.h = sha256.h || [], k = sha256.k = sha256.k || [], primeCounter = k.length;
+    var isComposite = {};
+    for(var candidate = 2; primeCounter < 64; candidate++){
+      if(!isComposite[candidate]){
+        for(i = 0; i < 313; i += candidate) isComposite[i] = candidate;
+        hash[primeCounter] = (Math.pow(candidate, .5) * maxWord) | 0;
+        k[primeCounter++] = (Math.pow(candidate, 1 / 3) * maxWord) | 0;
+      }
+    }
+    ascii += '\x80';
+    while(ascii.length % 64 - 56) ascii += '\x00';
+    for(i = 0; i < ascii.length; i++){
+      j = ascii.charCodeAt(i);
+      if(j >> 8) return null;
+      words[i >> 2] |= j << ((3 - i) % 4) * 8;
+    }
+    words[words.length] = ((asciiBitLength / maxWord) | 0);
+    words[words.length] = (asciiBitLength);
+    for(j = 0; j < words.length;){
+      var w = words.slice(j, j += 16), oldHash = hash;
+      hash = hash.slice(0, 8);
+      for(i = 0; i < 64; i++){
+        var w15 = w[i - 15], w2 = w[i - 2];
+        var a = hash[0], e = hash[4];
+        var temp1 = hash[7] + (rr(e, 6) ^ rr(e, 11) ^ rr(e, 25)) + ((e & hash[5]) ^ ((~e) & hash[6])) + k[i]
+          + (w[i] = (i < 16) ? w[i] : (w[i - 16] + (rr(w15, 7) ^ rr(w15, 18) ^ (w15 >>> 3)) + w[i - 7] + (rr(w2, 17) ^ rr(w2, 19) ^ (w2 >>> 10))) | 0);
+        var temp2 = (rr(a, 2) ^ rr(a, 13) ^ rr(a, 22)) + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+        hash = [(temp1 + temp2) | 0].concat(hash);
+        hash[4] = (hash[4] + temp1) | 0;
+      }
+      for(i = 0; i < 8; i++) hash[i] = (hash[i] + oldHash[i]) | 0;
+    }
+    for(i = 0; i < 8; i++){
+      for(j = 3; j + 1; j--){
+        var b = (hash[i] >> (j * 8)) & 255;
+        result += ((b < 16) ? 0 : '') + b.toString(16);
+      }
+    }
+    return result;
+  }
+
+  function storedOk(){
+    try{ return window.localStorage.getItem(LOCK_KEY) === LOCK_HASH; }catch(e){ return false; }
+  }
+  function remember(){ try{ window.localStorage.setItem(LOCK_KEY, LOCK_HASH); }catch(e){} }
+  function forget(){ try{ window.localStorage.removeItem(LOCK_KEY); }catch(e){} }
+
+  var body = document.body;
+  var input = document.getElementById('lock-input');
+  var form = document.getElementById('lock-form');
+  var err = document.getElementById('lock-error');
+  var btn = document.getElementById('lock-submit');
+  var fails = 0;
+
+  function showLock(){
+    body.classList.add('locked');
+    input.value = ''; err.textContent = '';
+    setTimeout(function(){ try{ input.focus(); }catch(e){} }, 50);
+  }
+  function unlock(){ body.classList.remove('locked'); }
+
+  if(storedOk()) unlock(); else showLock();
+
+  form.addEventListener('submit', function(ev){
+    ev.preventDefault();
+    if(btn.disabled) return;
+    var code = String(input.value || '').trim();
+    if(sha256(LOCK_SALT + code) === LOCK_HASH){
+      fails = 0; remember(); unlock();
+    }else{
+      fails++;
+      err.textContent = 'Falscher Code.';
+      input.value = '';
+      form.classList.remove('shake'); void form.offsetWidth; form.classList.add('shake');
+      var wait = Math.min(fails * 1000, 8000);
+      btn.disabled = true;
+      setTimeout(function(){ btn.disabled = false; try{ input.focus(); }catch(e){} }, wait);
+    }
+  });
+
+  window.karteiLock = function(){ forget(); showLock(); };
+})();
+</script>
+
 
 <div id="setup-screen" class="setup-screen">
   <div class="setup-card">
@@ -496,11 +706,17 @@
     <h1>Kartei</h1>
     <p class="setup-sub">Bevor es losgeht: Wer spielt gegeneinander?</p>
     <form id="setup-form">
+      <div class="league-switch" id="league-switch" role="group" aria-label="Liga">
+        <button type="button" class="league-btn active" data-league="1">1. HBF</button>
+        <button type="button" class="league-btn" data-league="2">2. HBF</button>
+      </div>
       <label>Heimteam
-        <input id="setup-home" placeholder="z. B. Bayern München" required>
+        <select id="setup-home-select" required></select>
+        <input id="setup-home" class="custom-team-input hidden" placeholder="Team eingeben">
       </label>
       <label>Gastteam
-        <input id="setup-away" placeholder="z. B. Borussia Dortmund" required>
+        <select id="setup-away-select" required></select>
+        <input id="setup-away" class="custom-team-input hidden" placeholder="Team eingeben">
       </label>
       <button type="submit">Los geht's</button>
     </form>
@@ -511,7 +727,7 @@
 
   <div class="mode-switch" id="mode-switch">
     <button type="button" class="mode-switch-btn active" data-mode="entry">Erfassen</button>
-    <button type="button" class="mode-switch-btn" data-mode="overview">Übersicht</button>
+    <button type="button" class="mode-switch-btn" data-mode="overview">Dashboard</button>
   </div>
 
   <div class="topbar">
@@ -541,9 +757,11 @@
       <button class="tab" data-page="search" data-mode="overview">Suche</button>
     </nav>
     <div class="data-actions">
+      <button id="lock-btn" class="io-btn" title="Kartei sperren" onclick="window.karteiLock && window.karteiLock()">Sperren</button>
       <button id="print-export-btn" class="io-btn" title="Druckfertige Datei herunterladen (2 Seiten pro Team) — zum Öffnen und Drucken/Als PDF speichern im Browser">Druckversion</button>
       <button id="export-btn" class="io-btn" title="Alle Daten als Datei speichern">Exportieren</button>
       <label for="import-file-input" class="io-btn" title="Export-Datei wieder einlesen" style="cursor:pointer;">Importieren</label>
+      <button id="wipe-btn" class="io-btn danger" title="Alle Daten unwiderruflich löschen">Alles löschen</button>
       <input type="file" id="import-file-input" accept="application/json,.json" class="visually-hidden">
     </div>
   </div>
@@ -579,6 +797,9 @@
         </label>
         <label>Text
           <textarea id="f-text" placeholder="Der Fakt bzw. die Notiz…" required></textarea>
+        </label>
+        <label>Saison (optional)
+          <input id="f-season" placeholder="z. B. 2025/26" title="Doppelklick für Schnellauswahl">
         </label>
         <label>Bemerkungen (optional)
           <textarea id="f-remarks" class="remarks-field" placeholder="Zusätzliche Notiz…"></textarea>
@@ -632,7 +853,7 @@
           <input id="s-value" placeholder="z. B. 27" required>
         </label>
         <label>Saison / Datum (optional)
-          <input id="s-season" placeholder="z. B. 2025/26">
+          <input id="s-season" placeholder="z. B. 2025/26" title="Doppelklick für Schnellauswahl">
         </label>
         <label>Bemerkungen (optional)
           <textarea id="s-remarks" class="remarks-field" placeholder="Zusätzliche Notiz…"></textarea>
@@ -641,12 +862,36 @@
           <button type="submit" id="stat-submit-btn">Statistik speichern</button>
           <button type="button" id="stat-cancel-btn" class="form-cancel-btn hidden">Abbrechen</button>
         </div>
+
+        <h2>Schnellerfassung</h2>
+        <div class="mode-toggle" id="qs-mode-toggle">
+          <button type="button" class="mode-btn active" id="qs-mode-game" data-mode="game">Letztes Spiel</button>
+          <button type="button" class="mode-btn" id="qs-mode-season" data-mode="season">Diese Saison</button>
+        </div>
+        <label>Team
+          <select id="qs-team">
+            <option value="">– Team wählen –</option>
+          </select>
+        </label>
+        <label>Statistik-Art
+          <input id="qs-type" list="stat-type-list" placeholder="z. B. Tore">
+        </label>
+        <div id="qs-player-list" class="qs-player-list">
+          <div class="empty">Team wählen, um den Kader zu laden.</div>
+        </div>
+        <button type="button" id="qs-save-btn" class="quick-action-btn">Für alle Spieler speichern</button>
+        <span id="qs-status" class="save-status">Gespeichert ✓</span>
       </form>
 
       <div class="list-panel">
         <div class="list-head">
           <h2>Gespeicherte Statistiken</h2>
           <span id="stat-count-badge" class="count-badge">0</span>
+        </div>
+        <div class="pimp-actions">
+          <label for="stat-import-input" class="io-btn" style="cursor:pointer;" title="Statistiken aus einer Datei hinzufügen oder ergänzen – bestehende Daten bleiben erhalten">Statistik-Datei importieren</label>
+          <input type="file" id="stat-import-input" accept="application/json,.json" class="visually-hidden">
+          <button type="button" id="stat-export-btn" class="io-btn" title="Nur die Statistiken als Datei speichern">Statistiken exportieren</button>
         </div>
         <input type="text" id="stat-search" class="mini-search-input" placeholder="In Statistiken suchen…" autocomplete="off">
         <div id="stat-list" class="entry-list"></div>
@@ -683,6 +928,9 @@
             <input id="p-rot" type="number" min="0" step="1" placeholder="0">
           </label>
         </div>
+        <label>Saison (optional)
+          <input id="p-season" placeholder="z. B. 2025/26" title="Doppelklick für Schnellauswahl">
+        </label>
         <label>Bemerkungen (optional)
           <textarea id="p-remarks" class="remarks-field" placeholder="Zusätzliche Notiz…"></textarea>
         </label>
@@ -690,6 +938,23 @@
           <button type="submit" id="penalty-submit-btn">Strafe speichern</button>
           <button type="button" id="penalty-cancel-btn" class="form-cancel-btn hidden">Abbrechen</button>
         </div>
+
+        <h2>Schnellerfassung</h2>
+        <div class="mode-toggle">
+          <button type="button" class="mode-btn active" id="qp-mode-game" data-mode="game">Letztes Spiel</button>
+          <button type="button" class="mode-btn" id="qp-mode-season" data-mode="season">Diese Saison</button>
+        </div>
+        <label>Team
+          <select id="qp-team">
+            <option value="">– Team wählen –</option>
+          </select>
+        </label>
+        <div class="qp-head"><span>Gelb</span><span>2 Min</span><span>Rot</span></div>
+        <div id="qp-player-list" class="qs-player-list">
+          <div class="empty">Team wählen, um den Kader zu laden.</div>
+        </div>
+        <button type="button" id="qp-save-btn" class="quick-action-btn">Für alle Spieler speichern</button>
+        <span id="qp-status" class="save-status">Gespeichert ✓</span>
       </form>
 
       <div class="list-panel">
@@ -723,6 +988,7 @@
             <option value="">– Rolle wählen –</option>
             <option value="Trainer">Trainer</option>
             <option value="Co-Trainer">Co-Trainer</option>
+            <option value="Torwart-Trainer">Torwart-Trainer</option>
             <option value="Physio">Physio</option>
             <option value="Teambetreuer">Teambetreuer</option>
             <option value="Schiri 1">Schiri 1</option>
@@ -803,6 +1069,11 @@
         <div class="list-head">
           <h2>Gespeicherte Spieler</h2>
           <span id="player-count-badge" class="count-badge">0</span>
+        </div>
+        <div class="pimp-actions">
+          <label for="player-import-input" class="io-btn" style="cursor:pointer;" title="Spieler aus einer Datei hinzufügen oder ergänzen – bestehende Daten bleiben erhalten">Spieler-Datei importieren</label>
+          <input type="file" id="player-import-input" accept="application/json,.json" class="visually-hidden">
+          <button type="button" id="player-export-btn" class="io-btn" title="Nur die Spielerliste als Datei speichern">Spielerliste exportieren</button>
         </div>
         <input type="text" id="player-search" class="mini-search-input" placeholder="In Spielern suchen…" autocomplete="off">
         <div id="player-list" class="entry-list"></div>
@@ -1087,6 +1358,7 @@
         <button type="button" class="mode-btn active" id="dash-view-teams-btn" data-view="teams">Teams</button>
         <button type="button" class="mode-btn" id="dash-view-analysis-btn" data-view="analysis">Analyse</button>
         <button type="button" class="mode-btn" id="dash-view-form-btn" data-view="form">Form</button>
+        <button type="button" class="mode-btn" id="dash-view-h2h-btn" data-view="h2h">Vergleich</button>
         <button type="button" class="mode-btn" id="dash-view-officials-btn" data-view="officials">Offizielle</button>
         <button type="button" class="mode-btn" id="dash-view-photos-btn" data-view="photos">Fotos</button>
       </div>
@@ -1096,11 +1368,23 @@
           <div class="dashboard-col">
             <h2 id="dashboard-home-title">Heimteam</h2>
             <div id="dashboard-home-list" class="dashboard-player-list"></div>
+            <h2 class="dashboard-subhead">Team-Notizen</h2>
+            <div id="dashboard-home-team-entries" class="player-detail-related"></div>
           </div>
           <div class="dashboard-col">
             <h2 id="dashboard-away-title">Gastteam</h2>
             <div id="dashboard-away-list" class="dashboard-player-list"></div>
+            <h2 class="dashboard-subhead">Team-Notizen</h2>
+            <div id="dashboard-away-team-entries" class="player-detail-related"></div>
           </div>
+        </div>
+      </div>
+
+      <div id="dashboard-h2h-view" class="dashboard-subview">
+        <div class="dashboard-col">
+          <h2>Direkter Vergleich</h2>
+          <div id="dashboard-h2h-summary" class="h2h-summary"></div>
+          <div id="dashboard-h2h-list" class="entry-list"></div>
         </div>
       </div>
 
@@ -1234,6 +1518,73 @@
 
   <div id="toast" class="toast hidden"></div>
 
+  <div id="pimp-overlay" class="confirm-overlay hidden">
+    <div class="confirm-box pimp-box">
+      <h3>Spieler-Import</h3>
+      <p class="pimp-sub" id="pimp-file-info"></p>
+      <div id="pimp-map" class="pimp-map"></div>
+      <label class="pimp-check"><input type="checkbox" id="pimp-overwrite"><span>Abweichende Werte bestehender Spieler überschreiben. Status, Status-Notiz und Meilensteine werden nie überschrieben; ohne Haken werden nur leere Felder ergänzt.</span></label>
+      <div id="pimp-result"></div>
+      <div class="confirm-actions">
+        <button id="pimp-cancel" class="confirm-cancel-btn">Abbrechen</button>
+        <button id="pimp-ok" class="confirm-ok-btn pimp-ok-btn">Importieren</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="kn-help-overlay" class="confirm-overlay hidden">
+    <div class="confirm-box kn-help-box">
+      <h3>Tastatur-Kürzel</h3>
+      <h4>Menüs</h4>
+      <div class="kn-help-row"><kbd>← →</kbd><span>Menü wechseln</span></div>
+      <div class="kn-help-row"><kbd>1 – 9</kbd><span>Menü direkt wählen</span></div>
+      <div class="kn-help-row"><kbd>E / D</kbd><span>Erfassen / Dashboard</span></div>
+      <div class="kn-help-row"><kbd>/</kbd><span>Suche öffnen</span></div>
+      <h4>Dashboard-Ansichten</h4>
+      <div class="kn-help-row"><kbd>T A F V</kbd><span>Teams, Analyse, Form, Vergleich</span></div>
+      <div class="kn-help-row"><kbd>B</kbd><span>Fotos</span></div>
+      <h4>Spieler</h4>
+      <div class="kn-help-row"><kbd>H</kbd><span>Heimteam-Liste</span></div>
+      <div class="kn-help-row"><kbd>G</kbd><span>Gastteam-Liste</span></div>
+      <div class="kn-help-row"><kbd>O</kbd><span>Offizielle</span></div>
+      <div class="kn-help-row"><kbd>↑ ↓</kbd><span>Spieler auswählen</span></div>
+      <div class="kn-help-row"><kbd>Zahl</kbd><span>Trikotnummer eintippen (z. B. 1, 8 für 18)</span></div>
+      <div class="kn-help-row"><kbd>Enter</kbd><span>Detailansicht öffnen</span></div>
+      <div class="kn-help-row"><kbd>← →</kbd><span>in der Detailansicht: vorige / nächste Spielerin</span></div>
+      <div class="kn-help-row"><kbd>Esc</kbd><span>Detailansicht schließen / Auswahl aufheben</span></div>
+      <div class="confirm-actions" style="margin-top:16px;">
+        <button id="kn-help-close" class="confirm-cancel-btn">Schließen</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="simp-overlay" class="confirm-overlay hidden">
+    <div class="confirm-box pimp-box">
+      <h3>Statistik-Import</h3>
+      <p class="pimp-sub" id="simp-file-info"></p>
+      <div id="simp-map" class="pimp-map"></div>
+      <div class="pimp-map">
+        <div class="pimp-team">Saison / Datum</div>
+        <select id="simp-season">
+          <option value="file">Wie in der Datei</option>
+          <option value="game">Letztes Spiel</option>
+          <option value="game2">Vorletztes Spiel</option>
+          <option value="game3">Drittletztes Spiel</option>
+          <option value="matchday">Spieltag …</option>
+          <option value="season" id="simp-season-opt"></option>
+        </select>
+        <div class="pimp-team hidden" id="simp-md-label">Spieltag-Nummer</div>
+        <input type="text" id="simp-matchday" class="hidden" inputmode="numeric" maxlength="2" placeholder="z. B. 5">
+      </div>
+      <label class="pimp-check"><input type="checkbox" id="simp-overwrite"><span>Abweichende Werte bereits gespeicherter Statistiken überschreiben. Ohne Haken werden nur neue Statistiken angelegt und leere Bemerkungen ergänzt; Farbe und Ausblenden bleiben immer unverändert.</span></label>
+      <div id="simp-result"></div>
+      <div class="confirm-actions">
+        <button id="simp-cancel" class="confirm-cancel-btn">Abbrechen</button>
+        <button id="simp-ok" class="confirm-ok-btn pimp-ok-btn">Importieren</button>
+      </div>
+    </div>
+  </div>
+
   <div id="player-detail-overlay" class="confirm-overlay hidden">
     <div class="confirm-box player-detail-box">
       <div id="player-detail-content"></div>
@@ -1316,6 +1667,21 @@
   const CUSTOM_TEAM_VALUE = '__custom__';
   const OFFICIALS_TEAM = 'Offizielle';
 
+  // GitHub Pages / normale Browser stellen window.storage nicht bereit.
+  // In diesem Fall lokale, persistente Speicherung verwenden.
+  if (!window.storage || typeof window.storage.get !== 'function' || typeof window.storage.set !== 'function') {
+    window.storage = {
+      async get(key) {
+        try { return { value: window.localStorage.getItem(String(key)) }; }
+        catch (error) { throw new Error('Lokaler Speicher kann nicht gelesen werden: ' + error.message); }
+      },
+      async set(key, value) {
+        try { window.localStorage.setItem(String(key), String(value)); return true; }
+        catch (error) { throw new Error('Lokaler Speicher kann nicht beschrieben werden: ' + error.message); }
+      }
+    };
+  }
+
   let entries = [];
   let stats = [];
   let penalties = [];
@@ -1349,16 +1715,17 @@
   let editingPlayerId = null;
   let editingH2HId = null;
   let h2h = [];
+  let currentPlayerDetailId = null;
 
   const TAG_COLORS = [
     { key: 'red',    hex: '#f35561', label: 'Rot' },
-    { key: 'orange', hex: '#fdb880', label: 'Orange' },
+    { key: 'orange', hex: '#FE7402', label: 'Orange' },
     { key: 'yellow', hex: '#f4d488', label: 'Gelb' },
-    { key: 'green',  hex: '#2ac6b3', label: 'Grün' },
-    { key: 'blue',   hex: '#76aeff', label: 'Blau' },
+    { key: 'green',  hex: '#6aa0ff', label: 'Grün' },
+    { key: 'blue',   hex: '#5b92ff', label: 'Blau' },
     { key: 'purple', hex: '#b07af1', label: 'Lila' },
     { key: 'pink',   hex: '#fb7ac7', label: 'Pink' },
-    { key: 'gray',   hex: '#a1a9b6', label: 'Grau' }
+    { key: 'gray',   hex: '#a6aec6', label: 'Grau' }
   ];
 
   function tagColorHex(key){
@@ -1445,18 +1812,77 @@
   }
 
   async function persistTeams(){
-    try{ await window.storage.set(TEAMS_KEY, JSON.stringify(teams), false); }
-    catch(e){ console.error('Speichern fehlgeschlagen', e); }
+    try{ await window.storage.set(TEAMS_KEY, JSON.stringify(teams), false); return true; }
+    catch(e){ console.error('Teams konnten nicht gespeichert werden', e); showToast('Teams konnten nicht gespeichert werden.', true); return false; }
+  }
+
+  /* Teamlisten der Alsco HBF (Saison 2026/27). Hier anpassen, falls sich ein Name oder Team ändert. */
+  const LEAGUE_TEAMS = {
+    '1': [
+      'Borussia Dortmund','HSG Blomberg-Lippe','Thüringer HC','VfL Oldenburg','TuS Metzingen',
+      'HSG Bensheim/Auerbach','Frisch Auf Göppingen','Buxtehuder SV','BSV Sachsen Zwickau',
+      'SV Union Halle-Neustadt','HC Leipzig','Neckarsulmer Sport-Union'
+    ],
+    '2': [
+      'SG Nürtingen-Zizishausen','FSV Mainz 05','Füchse Berlin','HSG Regensburg','VfL Waiblingen',
+      'Solingen-Gräfrath','HC Rödertal','HSG Freiburg','HL Buchholz 08-Rosengarten','Werder Bremen',
+      'HC Rostock','TuS Lintfort','SG Kirchhof','SG Todesfelde/Leezen','Bergischer HC','Bayer 04 Leverkusen'
+    ]
+  };
+  let setupLeague = '1';
+
+  function guessLeague(){
+    if(teams.league === '1' || teams.league === '2') return teams.league;
+    const names = [teams.home, teams.away];
+    if(names.some(n => LEAGUE_TEAMS['2'].includes(n))) return '2';
+    return '1';
+  }
+
+  function fillTeamSelect(selectId, customId, wanted){
+    const sel = document.getElementById(selectId);
+    const custom = document.getElementById(customId);
+    const list = LEAGUE_TEAMS[setupLeague];
+    sel.innerHTML = '<option value="">– Team wählen –</option>'
+      + list.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('')
+      + `<option value="${CUSTOM_TEAM_VALUE}">Anderes Team …</option>`;
+    if(wanted && list.includes(wanted)){
+      sel.value = wanted; custom.value = ''; custom.classList.add('hidden');
+    }else if(wanted){
+      sel.value = CUSTOM_TEAM_VALUE; custom.value = wanted; custom.classList.remove('hidden');
+    }else{
+      sel.value = ''; custom.value = ''; custom.classList.add('hidden');
+    }
+  }
+
+  function setLeague(league, keepTeams){
+    setupLeague = league;
+    document.querySelectorAll('#league-switch .league-btn')
+      .forEach(b => b.classList.toggle('active', b.dataset.league === league));
+    const h = keepTeams ? teams.home : '';
+    const a = keepTeams ? teams.away : '';
+    fillTeamSelect('setup-home-select','setup-home', h);
+    fillTeamSelect('setup-away-select','setup-away', a);
+  }
+
+  document.querySelectorAll('#league-switch .league-btn').forEach(b=>{
+    b.addEventListener('click', ()=> setLeague(b.dataset.league, false));
+  });
+  [['setup-home-select','setup-home'],['setup-away-select','setup-away']].forEach(([sid,cid])=>{
+    document.getElementById(sid).addEventListener('change', ()=>{
+      const isCustom = document.getElementById(sid).value === CUSTOM_TEAM_VALUE;
+      const c = document.getElementById(cid);
+      c.classList.toggle('hidden', !isCustom);
+      if(isCustom){ try{ c.focus(); }catch(e){} }
+    });
+  });
+
+  function readSetupTeam(selectId, customId){
+    const v = document.getElementById(selectId).value;
+    return v === CUSTOM_TEAM_VALUE ? document.getElementById(customId).value.trim() : v;
   }
 
   function showSetup(prefill){
-    if(prefill){
-      document.getElementById('setup-home').value = teams.home;
-      document.getElementById('setup-away').value = teams.away;
-    }else{
-      document.getElementById('setup-home').value = '';
-      document.getElementById('setup-away').value = '';
-    }
+    setLeague(prefill ? guessLeague() : (teams.league === '2' ? '2' : '1'), !!prefill);
     document.getElementById('setup-screen').classList.remove('hidden');
     document.getElementById('app-shell').classList.add('hidden');
   }
@@ -1514,6 +1940,30 @@
       if([teams.home, teams.away, '', CUSTOM_TEAM_VALUE].includes(homeCurrent)) h2hHomeSel.value = homeCurrent;
       if([teams.home, teams.away, '', CUSTOM_TEAM_VALUE].includes(awayCurrent)) h2hAwaySel.value = awayCurrent;
     }
+
+    const qsTeamSel = document.getElementById('qs-team');
+    if(qsTeamSel){
+      const qsCurrent = qsTeamSel.value;
+      qsTeamSel.innerHTML = `
+        <option value="">– Team wählen –</option>
+        <option value="${escapeHtml(teams.home)}">${escapeHtml(teams.home)}</option>
+        <option value="${escapeHtml(teams.away)}">${escapeHtml(teams.away)}</option>
+      `;
+      if([teams.home, teams.away, ''].includes(qsCurrent)) qsTeamSel.value = qsCurrent;
+      if(typeof renderQuickStatRoster === 'function') renderQuickStatRoster();
+    }
+
+    const qpTeamSel = document.getElementById('qp-team');
+    if(qpTeamSel){
+      const qpCurrent = qpTeamSel.value;
+      qpTeamSel.innerHTML = `
+        <option value="">– Team wählen –</option>
+        <option value="${escapeHtml(teams.home)}">${escapeHtml(teams.home)}</option>
+        <option value="${escapeHtml(teams.away)}">${escapeHtml(teams.away)}</option>
+      `;
+      if([teams.home, teams.away, ''].includes(qpCurrent)) qpTeamSel.value = qpCurrent;
+      if(typeof renderQuickPenaltyRoster === 'function') renderQuickPenaltyRoster();
+    }
   }
 
   const CUSTOM_PLAYER_VALUE = '__custom_player__';
@@ -1551,7 +2001,7 @@
     return comparePlayersForSelect(a, b);
   }
 
-  const ROLE_ABBR = { 'Trainer':'TR', 'Co-Trainer':'CO', 'Physio':'PH', 'Teambetreuer':'TB', 'Schiri 1':'S1', 'Schiri 2':'S2', 'Zeitnehmer':'ZN', 'Sekretär':'SK' };
+  const ROLE_ABBR = { 'Trainer':'TR', 'Co-Trainer':'CO', 'Torwart-Trainer':'TT', 'Physio':'PH', 'Teambetreuer':'TB', 'Schiri 1':'S1', 'Schiri 2':'S2', 'Zeitnehmer':'ZN', 'Sekretär':'SK' };
 
   function statusBadgeClass(status){
     if(status === 'Verletzt') return 'status-verletzt';
@@ -1718,10 +2168,14 @@
 
   document.getElementById('setup-form').addEventListener('submit', async (e)=>{
     e.preventDefault();
-    const home = document.getElementById('setup-home').value.trim();
-    const away = document.getElementById('setup-away').value.trim();
+    const home = readSetupTeam('setup-home-select','setup-home');
+    const away = readSetupTeam('setup-away-select','setup-away');
     if(!home || !away) return;
-    teams = { home, away };
+    if(home.toLowerCase() === away.toLowerCase()){
+      showToast('Heim- und Gastteam müssen verschieden sein.', true);
+      return;
+    }
+    teams = { home, away, league: setupLeague };
     await persistTeams();
     showApp();
     renderChips();
@@ -1776,21 +2230,25 @@
     try{
       const res = await window.storage.get(STORAGE_KEY, false);
       entries = res && res.value ? JSON.parse(res.value) : [];
+      if(!Array.isArray(entries)) throw new Error('Ungültige Eintragsdaten');
     }catch(e){ entries = []; }
 
     try{
       const res2 = await window.storage.get(STATS_KEY, false);
       stats = res2 && res2.value ? JSON.parse(res2.value) : [];
+      if(!Array.isArray(stats)) throw new Error('Ungültige Statistikdaten');
     }catch(e){ stats = []; }
 
     try{
       const res3 = await window.storage.get(PENALTIES_KEY, false);
       penalties = res3 && res3.value ? JSON.parse(res3.value) : [];
+      if(!Array.isArray(penalties)) throw new Error('Ungültige Strafdaten');
     }catch(e){ penalties = []; }
 
     try{
       const res4 = await window.storage.get(PLAYERS_KEY, false);
       players = res4 && res4.value ? JSON.parse(res4.value) : [];
+      if(!Array.isArray(players)) throw new Error('Ungültige Spielerdaten');
     }catch(e){ players = []; }
 
     renderInputList();
@@ -1800,24 +2258,24 @@
     populatePlayerSelect();
     renderChips();
     renderResults();
+    renderQuickStatRoster();
+    renderQuickPenaltyRoster();
   }
 
-  async function persist(){
-    try{ await window.storage.set(STORAGE_KEY, JSON.stringify(entries), false); }
-    catch(e){ console.error('Speichern fehlgeschlagen', e); }
+  async function persistKey(key, value, label){
+    try{
+      await window.storage.set(key, JSON.stringify(value), false);
+      return true;
+    }catch(e){
+      console.error('Speichern fehlgeschlagen (' + label + ')', e);
+      showToast(label + ' konnten nicht gespeichert werden. Prüfe Speicherplatz und Browser-Berechtigungen.', true);
+      return false;
+    }
   }
-  async function persistStats(){
-    try{ await window.storage.set(STATS_KEY, JSON.stringify(stats), false); }
-    catch(e){ console.error('Speichern fehlgeschlagen', e); }
-  }
-  async function persistPenalties(){
-    try{ await window.storage.set(PENALTIES_KEY, JSON.stringify(penalties), false); }
-    catch(e){ console.error('Speichern fehlgeschlagen', e); }
-  }
-  async function persistPlayers(){
-    try{ await window.storage.set(PLAYERS_KEY, JSON.stringify(players), false); }
-    catch(e){ console.error('Speichern fehlgeschlagen', e); }
-  }
+  async function persist(){ return persistKey(STORAGE_KEY, entries, 'Einträge'); }
+  async function persistStats(){ return persistKey(STATS_KEY, stats, 'Statistiken'); }
+  async function persistPenalties(){ return persistKey(PENALTIES_KEY, penalties, 'Strafen'); }
+  async function persistPlayers(){ return persistKey(PLAYERS_KEY, players, 'Spieler'); }
 
   function deriveEntryTitle(player, category, text){
     if(player) return player;
@@ -1833,6 +2291,7 @@
     const color = document.getElementById('f-color').value;
     const player = document.getElementById('f-player').value;
     const text = document.getElementById('f-text').value.trim();
+    const season = document.getElementById('f-season').value.trim();
     const remarks = document.getElementById('f-remarks').value.trim();
     if(!text) return;
     const title = deriveEntryTitle(player, category, text);
@@ -1840,14 +2299,14 @@
     if(editingEntryId){
       const en = entries.find(x => x.id === editingEntryId);
       if(en){
-        Object.assign(en, { title, category, team, color, player, text, remarks });
+        Object.assign(en, { title, category, team, color, player, text, season, remarks });
       }
       editingEntryId = null;
       setEditUI('entry-submit-btn', 'entry-cancel-btn', false, 'Eintrag speichern', 'Eintrag aktualisieren');
     }else{
       entries.unshift({
         id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
-        title, category, team, color, player, text, remarks, createdAt: Date.now()
+        title, category, team, color, player, text, season, remarks, createdAt: Date.now()
       });
     }
 
@@ -1880,6 +2339,7 @@
     document.getElementById('f-color').value = en.color || '';
     fColorPicker.refresh();
     document.getElementById('f-text').value = en.text;
+    document.getElementById('f-season').value = en.season || '';
     document.getElementById('f-remarks').value = en.remarks || '';
     editingEntryId = id;
     setEditUI('entry-submit-btn', 'entry-cancel-btn', true, 'Eintrag speichern', 'Eintrag aktualisieren');
@@ -1899,7 +2359,7 @@
     document.getElementById('count-badge').textContent = entries.length;
     const q = document.getElementById('entry-search').value.trim().toLowerCase();
     const filtered = q ? entries.filter(en => {
-      const hay = [en.title, en.category, en.team, en.player, en.text, en.remarks].filter(Boolean).join(' ').toLowerCase();
+      const hay = [en.title, en.category, en.team, en.player, en.text, en.season, en.remarks].filter(Boolean).join(' ').toLowerCase();
       return hay.includes(q);
     }) : entries;
 
@@ -1924,10 +2384,89 @@
         ${en.team ? `<span class="team-label">${escapeHtml(en.team)}</span>` : ''}
         ${en.player ? `<span class="stat-meta"> · ${escapeHtml(en.player)}</span>` : ''}
         <div class="card-text">${escapeHtml(en.text)}</div>
+        ${en.season ? `<span class="stat-meta">${escapeHtml(en.season)}</span>` : ''}
         ${en.remarks ? `<div class="remarks-line">Bemerkung: ${escapeHtml(en.remarks)}</div>` : ''}
       </div>
     `).join('');
   }
+
+  /* ---------- Saison-Schnellauswahl (Doppelklick) ---------- */
+  function seasonStartYear(offset){
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const base = month >= 7 ? now.getFullYear() : now.getFullYear() - 1;
+    return base + offset;
+  }
+
+  function seasonLabel(offset){
+    const start = seasonStartYear(offset);
+    const endYY = String((start + 1) % 100).padStart(2, '0');
+    return `${start}/${endYY}`;
+  }
+
+  function closeSeasonPicker(){
+    const existing = document.getElementById('season-picker-popup');
+    if(existing) existing.remove();
+    document.removeEventListener('click', onSeasonPickerOutsideClick, true);
+    document.removeEventListener('keydown', onSeasonPickerKeydown, true);
+  }
+
+  function onSeasonPickerOutsideClick(e){
+    const popup = document.getElementById('season-picker-popup');
+    if(popup && !popup.contains(e.target)) closeSeasonPicker();
+  }
+
+  function onSeasonPickerKeydown(e){
+    if(e.key === 'Escape') closeSeasonPicker();
+  }
+
+  function openSeasonPicker(input){
+    closeSeasonPicker();
+    const rect = input.getBoundingClientRect();
+    const popup = document.createElement('div');
+    popup.id = 'season-picker-popup';
+    popup.className = 'season-picker-popup';
+
+    const options = [
+      { label: `Letzte Saison (${seasonLabel(-1)})`, value: seasonLabel(-1) },
+      { label: seasonLabel(0), value: seasonLabel(0) }
+    ];
+    options.forEach(opt=>{
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'season-picker-option';
+      btn.textContent = opt.label;
+      btn.addEventListener('click', ()=>{
+        input.value = opt.value;
+        input.dispatchEvent(new Event('input'));
+        closeSeasonPicker();
+      });
+      popup.appendChild(btn);
+    });
+
+    document.body.appendChild(popup);
+    const left = Math.max(8, Math.min(rect.left, window.innerWidth - popup.offsetWidth - 8));
+    popup.style.top = `${rect.bottom + 4}px`;
+    popup.style.left = `${left}px`;
+
+    setTimeout(()=>{
+      document.addEventListener('click', onSeasonPickerOutsideClick, true);
+      document.addEventListener('keydown', onSeasonPickerKeydown, true);
+    }, 0);
+  }
+
+  function attachSeasonPicker(inputId){
+    const input = document.getElementById(inputId);
+    if(!input) return;
+    input.addEventListener('dblclick', (e)=>{
+      e.preventDefault();
+      openSeasonPicker(input);
+    });
+  }
+
+  attachSeasonPicker('s-season');
+  attachSeasonPicker('f-season');
+  attachSeasonPicker('p-season');
 
   /* ---------- Stats ---------- */
   document.getElementById('stat-form').addEventListener('submit', async (e)=>{
@@ -2036,6 +2575,91 @@
     `).join('');
   }
 
+  /* ---------- Schnellerfassung: Letztes Spiel (Stats für den ganzen Kader auf einmal) ---------- */
+  /* Wahl: Wert aus dem letzten Spiel oder aus der laufenden Saison. Der Wert landet im Feld "Saison / Datum". */
+  const LAST_GAME_LABEL = 'Letztes Spiel';
+  let qsMode = 'game';
+  function qsLabel(){ return qsMode === 'season' ? seasonLabel(0) : LAST_GAME_LABEL; }
+  document.getElementById('qs-mode-season').textContent = 'Diese Saison (' + seasonLabel(0) + ')';
+  ['qs-mode-game', 'qs-mode-season'].forEach(id => {
+    document.getElementById(id).addEventListener('click', () => {
+      qsMode = document.getElementById(id).dataset.mode;
+      document.getElementById('qs-mode-game').classList.toggle('active', qsMode === 'game');
+      document.getElementById('qs-mode-season').classList.toggle('active', qsMode === 'season');
+      renderQuickStatRoster();
+    });
+  });
+
+  function renderQuickStatRoster(){
+    const box = document.getElementById('qs-player-list');
+    if(!box) return;
+    const team = document.getElementById('qs-team').value;
+    const statType = document.getElementById('qs-type').value.trim();
+
+    if(!team){
+      box.innerHTML = '<div class="empty">Team wählen, um den Kader zu laden.</div>';
+      return;
+    }
+    const roster = players.filter(p => p.team === team && !p.role).sort(comparePlayersForList);
+    if(roster.length === 0){
+      box.innerHTML = '<div class="empty">Noch keine Spieler für dieses Team — im Reiter „Spieler" anlegen.</div>';
+      return;
+    }
+    box.innerHTML = roster.map(p => {
+      const existing = statType ? stats.find(s => statNameNorm(s.name) === statNameNorm(p.name) && pimpNorm(s.team) === pimpNorm(team) && s.statType === statType && s.season === qsLabel()) : null;
+      return `
+        <div class="qs-row">
+          <span class="qs-player-name">${p.number ? '#'+escapeHtml(p.number)+' ' : ''}${escapeHtml(p.name)}</span>
+          <input type="text" inputmode="decimal" class="qs-value-input" data-id="${p.id}" value="${existing ? escapeHtml(existing.value) : ''}" placeholder="–">
+        </div>
+      `;
+    }).join('');
+  }
+
+  document.getElementById('qs-team').addEventListener('change', renderQuickStatRoster);
+  document.getElementById('qs-type').addEventListener('change', renderQuickStatRoster);
+
+  document.getElementById('qs-save-btn').addEventListener('click', async ()=>{
+    const team = document.getElementById('qs-team').value;
+    const statType = document.getElementById('qs-type').value.trim();
+    if(!team || !statType) return;
+
+    let changed = false;
+    document.querySelectorAll('#qs-player-list .qs-value-input').forEach(input=>{
+      const player = players.find(p => p.id === input.dataset.id);
+      if(!player) return;
+      const value = input.value.trim();
+      const existingIdx = stats.findIndex(s => statNameNorm(s.name) === statNameNorm(player.name) && pimpNorm(s.team) === pimpNorm(team) && s.statType === statType && s.season === qsLabel());
+      if(value){
+        if(existingIdx > -1){
+          stats[existingIdx].value = value;
+        }else{
+          stats.push({
+            id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+            name: player.name, team, statType, value, season: qsLabel(), remarks: '', color: '', createdAt: Date.now()
+          });
+        }
+        changed = true;
+      }else if(existingIdx > -1){
+        stats.splice(existingIdx, 1);
+        changed = true;
+      }
+    });
+
+    if(changed){
+      await persistStats();
+      renderStatsList();
+      if(document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
+    }
+    document.querySelectorAll('#qs-player-list .qs-value-input').forEach(input=>{ input.value = ''; });
+
+    const status = document.getElementById('qs-status');
+    status.textContent = 'Gespeichert ✓';
+    status.style.opacity = '1';
+    clearTimeout(window.__qsStatusTimer);
+    window.__qsStatusTimer = setTimeout(()=>{ status.style.opacity = '0'; }, 2000);
+  });
+
   /* ---------- Penalties (Strafen) ---------- */
   document.getElementById('penalty-form').addEventListener('submit', async (e)=>{
     e.preventDefault();
@@ -2045,20 +2669,21 @@
     const gelb = parseInt(document.getElementById('p-gelb').value, 10) || 0;
     const zweimin = parseInt(document.getElementById('p-zweimin').value, 10) || 0;
     const rot = parseInt(document.getElementById('p-rot').value, 10) || 0;
+    const season = document.getElementById('p-season').value.trim();
     const remarks = document.getElementById('p-remarks').value.trim();
     if(!name) return;
 
     if(editingPenaltyId){
       const p = penalties.find(x => x.id === editingPenaltyId);
       if(p){
-        Object.assign(p, { name, team, color, gelb, zweimin, rot, remarks });
+        Object.assign(p, { name, team, color, gelb, zweimin, rot, season, remarks });
       }
       editingPenaltyId = null;
       setEditUI('penalty-submit-btn', 'penalty-cancel-btn', false, 'Strafe speichern', 'Strafe aktualisieren');
     }else{
       penalties.unshift({
         id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
-        name, team, color, gelb, zweimin, rot, remarks, createdAt: Date.now()
+        name, team, color, gelb, zweimin, rot, season, remarks, createdAt: Date.now()
       });
     }
 
@@ -2070,6 +2695,7 @@
     renderPenaltyList();
     renderChips();
     renderResults();
+    renderQuickPenaltyRoster();
   });
 
   document.getElementById('penalty-cancel-btn').addEventListener('click', ()=>{
@@ -2092,6 +2718,7 @@
     document.getElementById('p-gelb').value = p.gelb || 0;
     document.getElementById('p-zweimin').value = p.zweimin || 0;
     document.getElementById('p-rot').value = p.rot || 0;
+    document.getElementById('p-season').value = p.season || '';
     document.getElementById('p-remarks').value = p.remarks || '';
     editingPenaltyId = id;
     setEditUI('penalty-submit-btn', 'penalty-cancel-btn', true, 'Strafe speichern', 'Strafe aktualisieren');
@@ -2104,6 +2731,7 @@
     renderPenaltyList();
     renderChips();
     renderResults();
+    renderQuickPenaltyRoster();
   }
 
   function renderPenaltyList(){
@@ -2111,7 +2739,7 @@
     document.getElementById('penalty-count-badge').textContent = penalties.length;
     const q = document.getElementById('penalty-search').value.trim().toLowerCase();
     const filtered = q ? penalties.filter(p => {
-      const hay = [p.name, p.team, p.remarks, String(p.gelb), String(p.zweimin), String(p.rot)].filter(Boolean).join(' ').toLowerCase();
+      const hay = [p.name, p.team, p.season, p.remarks, String(p.gelb), String(p.zweimin), String(p.rot)].filter(Boolean).join(' ').toLowerCase();
       return hay.includes(q);
     }) : penalties;
 
@@ -2138,6 +2766,7 @@
           <div class="penalty-chip"><span class="p-label">2 Min</span><span class="p-value">${p.zweimin}</span></div>
           <div class="penalty-chip"><span class="p-label">Rot</span><span class="p-value">${p.rot}</span></div>
         </div>
+        ${p.season ? `<span class="stat-meta">${escapeHtml(p.season)}</span>` : ''}
         ${p.remarks ? `<div class="remarks-line">Bemerkung: ${escapeHtml(p.remarks)}</div>` : ''}
       </div>
     `).join('');
@@ -2202,6 +2831,8 @@
     await persistPlayers();
     renderPlayerList();
     populatePlayerSelect();
+    renderQuickStatRoster();
+    renderQuickPenaltyRoster();
     if(document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
   });
 
@@ -2246,6 +2877,8 @@
     await persistPlayers();
     renderPlayerList();
     populatePlayerSelect();
+    renderQuickStatRoster();
+    renderQuickPenaltyRoster();
     if(document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
   }
 
@@ -2283,6 +2916,129 @@
     `).join('');
   }
 
+  /* ---------- Schnellerfassung Strafen (Kader auf einmal, letztes Spiel oder Saison) ---------- */
+  let qpMode = 'game';
+  function qpLabel(){ return qpMode === 'season' ? seasonLabel(0) : LAST_GAME_LABEL; }
+  document.getElementById('qp-mode-season').textContent = 'Diese Saison (' + seasonLabel(0) + ')';
+  ['qp-mode-game', 'qp-mode-season'].forEach(id => {
+    document.getElementById(id).addEventListener('click', () => {
+      qpMode = document.getElementById(id).dataset.mode;
+      document.getElementById('qp-mode-game').classList.toggle('active', qpMode === 'game');
+      document.getElementById('qp-mode-season').classList.toggle('active', qpMode === 'season');
+      renderQuickPenaltyRoster();
+    });
+  });
+
+  function renderQuickPenaltyRoster(){
+    const box = document.getElementById('qp-player-list');
+    if(!box) return;
+    const team = document.getElementById('qp-team').value;
+    if(!team){
+      box.innerHTML = '<div class="empty">Team wählen, um den Kader zu laden.</div>';
+      return;
+    }
+    const roster = players.filter(p => p.team === team && !p.role).sort(comparePlayersForList);
+    if(roster.length === 0){
+      box.innerHTML = '<div class="empty">Noch keine Spieler für dieses Team — im Reiter „Spieler" anlegen.</div>';
+      return;
+    }
+    const label = qpLabel();
+    box.innerHTML = roster.map(p => {
+      const ex = penalties.find(x => x.name === p.name && x.team === team && x.season === label);
+      const v = k => (ex && ex[k]) ? ex[k] : '';
+      return `
+        <div class="qs-row" data-id="${p.id}">
+          <span class="qs-player-name">${p.number ? '#'+escapeHtml(p.number)+' ' : ''}${escapeHtml(p.name)}</span>
+          <span class="qp-inputs">
+            <input type="text" inputmode="numeric" data-k="gelb" value="${v('gelb')}" placeholder="–" aria-label="Gelb">
+            <input type="text" inputmode="numeric" data-k="zweimin" value="${v('zweimin')}" placeholder="–" aria-label="2 Minuten">
+            <input type="text" inputmode="numeric" data-k="rot" value="${v('rot')}" placeholder="–" aria-label="Rot">
+          </span>
+        </div>`;
+    }).join('');
+  }
+  document.getElementById('qp-team').addEventListener('change', renderQuickPenaltyRoster);
+
+  document.getElementById('qp-save-btn').addEventListener('click', async ()=>{
+    const team = document.getElementById('qp-team').value;
+    if(!team) return;
+    const label = qpLabel();
+    let changed = false;
+
+    document.querySelectorAll('#qp-player-list .qs-row').forEach(row=>{
+      const player = players.find(p => p.id === row.dataset.id);
+      if(!player) return;
+      const val = k => parseInt(row.querySelector(`input[data-k="${k}"]`).value, 10) || 0;
+      const gelb = val('gelb'), zweimin = val('zweimin'), rot = val('rot');
+      const idx = penalties.findIndex(x => x.name === player.name && x.team === team && x.season === label);
+      if(gelb || zweimin || rot){
+        if(idx > -1){
+          Object.assign(penalties[idx], { gelb, zweimin, rot });
+        }else{
+          penalties.unshift({
+            id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+            name: player.name, team, color: '', gelb, zweimin, rot, season: label, remarks: '', createdAt: Date.now()
+          });
+        }
+        changed = true;
+      }else if(idx > -1){
+        penalties.splice(idx, 1);
+        changed = true;
+      }
+    });
+
+    if(changed){
+      await persistPenalties();
+      renderPenaltyList();
+      renderChips();
+      renderResults();
+      if(document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
+    }
+    document.querySelectorAll('#qp-player-list input').forEach(i => { i.value = ''; });
+
+    const status = document.getElementById('qp-status');
+    status.textContent = 'Gespeichert ✓';
+    status.style.opacity = '1';
+    clearTimeout(window.__qpStatusTimer);
+    window.__qpStatusTimer = setTimeout(()=>{ status.style.opacity = '0'; }, 2000);
+  });
+
+  /* ---------- Offizielle aus dem Spieltag ins Team "Offizielle" übernehmen ---------- */
+  const OFFICIAL_ORDER = ['Schiri 1','Schiri 2','Zeitnehmer','Sekretär'];
+  const OFFICIAL_FIELDS = { 'Schiri 1':'schiri1', 'Schiri 2':'schiri2', 'Zeitnehmer':'zeitnehmer', 'Sekretär':'sekretaer' };
+
+  async function syncOfficialsFromMatchday(){
+    let changed = false;
+    OFFICIAL_ORDER.forEach(role => {
+      const name = String(matchday[OFFICIAL_FIELDS[role]] || '').trim();
+      const sameRole = players.filter(p => p.team === OFFICIALS_TEAM && p.role === role);
+      let existing = sameRole.find(p => p.fromMatchday) || sameRole.find(p => p.name.trim().toLowerCase() === name.toLowerCase());
+      if(name){
+        if(existing){
+          if(existing.name !== name || !existing.fromMatchday){ existing.name = name; existing.fromMatchday = true; changed = true; }
+        }else{
+          players.push({
+            id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+            name, team: OFFICIALS_TEAM, number:'', role, age:'', height:'', contract:'', position:'', nationality:'',
+            lastClub:'', transferDate:'', status:'Fit', statusNote:'', milestoneCurrent:'', milestoneTarget:'',
+            createdAt: Date.now(), fromMatchday: true
+          });
+          changed = true;
+        }
+      }else if(existing && existing.fromMatchday){
+        players = players.filter(p => p !== existing);
+        changed = true;
+      }
+    });
+    if(!changed) return;
+    await persistPlayers();
+    renderPlayerList();
+    populatePlayerSelect();
+    renderQuickStatRoster();
+    renderQuickPenaltyRoster();
+    if(document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
+  }
+
   /* ---------- Dashboard ---------- */
   function renderDashboard(){
     const homeList = document.getElementById('dashboard-home-list');
@@ -2290,7 +3046,11 @@
     const officialsList = document.getElementById('dashboard-officials-list');
     const homePlayers = players.filter(p => p.team === teams.home).sort((a,b)=> (parseInt(a.number)||999) - (parseInt(b.number)||999));
     const awayPlayers = players.filter(p => p.team === teams.away).sort((a,b)=> (parseInt(a.number)||999) - (parseInt(b.number)||999));
-    const officialsPlayers = players.filter(p => p.team === OFFICIALS_TEAM).sort((a,b)=> a.name.localeCompare(b.name));
+    const officialsPlayers = players.filter(p => p.team === OFFICIALS_TEAM).sort((a,b)=>{
+      const ra = OFFICIAL_ORDER.indexOf(a.role), rb = OFFICIAL_ORDER.indexOf(b.role);
+      const oa = ra === -1 ? 99 : ra, ob = rb === -1 ? 99 : rb;
+      return oa - ob || a.name.localeCompare(b.name);
+    });
 
     homeList.innerHTML = homePlayers.length ? homePlayers.map(playerCardHtml).join('') : '<div class="empty">Noch keine Spieler für dieses Team.</div>';
     awayList.innerHTML = awayPlayers.length ? awayPlayers.map(playerCardHtml).join('') : '<div class="empty">Noch keine Spieler für dieses Team.</div>';
@@ -2300,8 +3060,66 @@
       card.addEventListener('click', ()=> showPlayerDetail(card.dataset.id));
     });
 
+    renderDashboardTeamEntries('home', teams.home, 'dashboard-home-team-entries');
+    renderDashboardTeamEntries('away', teams.away, 'dashboard-away-team-entries');
+
     renderDashboardPhotos();
     renderDashboardAnalysis();
+    renderH2HDashboard();
+  }
+
+  function entryRelatedItemHtml(en, isHidden){
+    const actionBtn = isHidden
+      ? `<button type="button" class="related-hide-btn" title="Eintrag wieder einblenden" onclick="event.stopPropagation(); toggleEntryHidden('${en.id}', false)">↺</button>`
+      : `<button type="button" class="related-hide-btn" title="Eintrag ausblenden" onclick="event.stopPropagation(); toggleEntryHidden('${en.id}', true)">✕</button>`;
+    return `
+      <div class="related-item${isHidden ? ' is-hidden' : ''}"${en.color ? ` style="--tag-color:${tagColorHex(en.color)}"` : ''} onclick="showRelatedDetail('entry','${en.id}')">
+        ${actionBtn}
+        <span class="related-cat">${escapeHtml(en.category)}</span>
+        <div class="related-body">${escapeHtml(en.text)}</div>
+        ${en.remarks ? `<div class="related-remarks">${escapeHtml(en.remarks)}</div>` : ''}
+      </div>
+    `;
+  }
+
+  function hiddenEntriesToggleHtml(hiddenEntries, renderFn){
+    if(!hiddenEntries.length) return '';
+    const count = hiddenEntries.length;
+    const render = renderFn || entryRelatedItemHtml;
+    return `
+      <details class="hidden-entries-toggle">
+        <summary>${count} ausgeblendete${count === 1 ? 'r Eintrag' : ' Einträge'} anzeigen</summary>
+        <div class="hidden-entries-list">${hiddenEntries.map(en => render(en, true)).join('')}</div>
+      </details>
+    `;
+  }
+
+  function toggleEntryHidden(id, hidden){
+    const en = entries.find(x => x.id === id);
+    if(!en) return;
+    en.hidden = hidden;
+    persist();
+    renderInputList();
+    if(document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
+    if(currentPlayerDetailId && !document.getElementById('player-detail-overlay').classList.contains('hidden')){
+      showPlayerDetail(currentPlayerDetailId);
+    }
+  }
+
+  function renderDashboardTeamEntries(side, teamName, containerId){
+    const box = document.getElementById(containerId);
+    if(!box) return;
+    const teamEntries = entries.filter(en => en.team === teamName && !en.player);
+    const visibleEntries = teamEntries.filter(en => !en.hidden);
+    const hiddenEntries = teamEntries.filter(en => en.hidden);
+    if(teamEntries.length === 0){
+      box.innerHTML = '<div class="empty">Noch keine Team-Einträge ohne Spielerbezug.</div>';
+      return;
+    }
+    const visibleHtml = visibleEntries.length
+      ? visibleEntries.map(en => entryRelatedItemHtml(en, false)).join('')
+      : '<div class="empty">Alle Team-Einträge sind ausgeblendet.</div>';
+    box.innerHTML = visibleHtml + hiddenEntriesToggleHtml(hiddenEntries);
   }
 
   function renderDashboardPhotos(){
@@ -2330,7 +3148,7 @@
     document.getElementById('lightbox-img').src = '';
   });
 
-  const DASH_VIEWS = ['teams', 'officials', 'photos', 'analysis', 'form'];
+  const DASH_VIEWS = ['teams', 'officials', 'photos', 'analysis', 'form', 'h2h'];
   DASH_VIEWS.forEach(view=>{
     document.getElementById(`dash-view-${view}-btn`).addEventListener('click', ()=>{
       DASH_VIEWS.forEach(v=>{
@@ -2357,12 +3175,15 @@
   function showPlayerDetail(id){
     const p = players.find(pl => pl.id === id);
     if(!p) return;
+    currentPlayerDetailId = id;
 
     const related = [
-      ...entries.filter(en => en.player === p.name).map(en => ({ kind:'entry', id:en.id, cat: en.category, body: en.text, color: en.color, remarks: en.remarks })),
-      ...stats.filter(s => s.name === p.name).map(s => ({ kind:'stat', id:s.id, cat: 'Statistik', body: `${s.statType}: ${s.value}${s.season ? ' ('+s.season+')' : ''}`, color: s.color, remarks: s.remarks })),
-      ...penalties.filter(pe => pe.name === p.name).map(pe => ({ kind:'penalty', id:pe.id, cat: 'Strafe', body: `Gelb: ${pe.gelb} · 2 Min: ${pe.zweimin} · Rot: ${pe.rot}`, color: pe.color, remarks: pe.remarks }))
+      ...entries.filter(en => statNameNorm(en.player) === statNameNorm(p.name) && (!en.team || pimpNorm(en.team) === pimpNorm(p.team))).map(en => ({ kind:'entry', id:en.id, cat: en.category, body: en.text, color: en.color, remarks: en.remarks, hidden: !!en.hidden })),
+      ...stats.filter(s => statNameNorm(s.name) === statNameNorm(p.name) && pimpNorm(s.team) === pimpNorm(p.team)).map(s => ({ kind:'stat', id:s.id, cat: 'Statistik', body: `${s.statType}: ${s.value}${s.season ? ' ('+s.season+')' : ''}`, color: s.color, remarks: s.remarks, hidden: !!s.hidden })),
+      ...penalties.filter(pe => statNameNorm(pe.name) === statNameNorm(p.name) && pimpNorm(pe.team) === pimpNorm(p.team)).map(pe => ({ kind:'penalty', id:pe.id, cat: 'Strafe', body: `Gelb: ${pe.gelb} · 2 Min: ${pe.zweimin} · Rot: ${pe.rot}`, color: pe.color, remarks: pe.remarks, hidden: !!pe.hidden }))
     ];
+    const visibleRelated = related.filter(r => !r.hidden);
+    const hiddenRelated = related.filter(r => r.hidden);
 
     const badge = p.role ? (ROLE_ABBR[p.role] || p.role.slice(0,2).toUpperCase()) : (p.number ? escapeHtml(p.number) : '–');
     const html = `
@@ -2394,7 +3215,8 @@
       ` : ''}
       ${related.length ? `
         <div class="player-detail-related">
-          ${related.map(r => `<button type="button" class="related-item"${r.color ? ` style="--tag-color:${tagColorHex(r.color)}"` : ''} onclick="showRelatedDetail('${r.kind}','${r.id}')"><span class="related-cat">${escapeHtml(r.cat)}</span><div class="related-body">${escapeHtml(r.body)}</div>${r.remarks ? `<div class="related-remarks">${escapeHtml(r.remarks)}</div>` : ''}</button>`).join('')}
+          ${visibleRelated.length ? visibleRelated.map(r => relatedDetailItemHtml(r, false)).join('') : '<div class="player-detail-empty" style="grid-column:1 / -1;">Alle Einträge sind ausgeblendet.</div>'}
+          ${hiddenEntriesToggleHtml(hiddenRelated, relatedDetailItemHtml)}
         </div>
       ` : `<div class="player-detail-empty">Noch keine Einträge, Statistiken oder Strafen für diesen Spieler.</div>`}
     `;
@@ -2402,8 +3224,43 @@
     document.getElementById('player-detail-overlay').classList.remove('hidden');
   }
 
+  function relatedDetailItemHtml(r, isHidden){
+    const hideBtn = isHidden
+      ? `<button type="button" class="related-hide-btn" title="Wieder einblenden" onclick="event.stopPropagation(); toggleRelatedHidden('${r.kind}','${r.id}', false)">↺</button>`
+      : `<button type="button" class="related-hide-btn" title="Ausblenden" onclick="event.stopPropagation(); toggleRelatedHidden('${r.kind}','${r.id}', true)">✕</button>`;
+    return `
+      <div class="related-item${isHidden ? ' is-hidden' : ''}"${r.color ? ` style="--tag-color:${tagColorHex(r.color)}"` : ''} onclick="showRelatedDetail('${r.kind}','${r.id}')">
+        ${hideBtn}
+        <span class="related-cat">${escapeHtml(r.cat)}</span>
+        <div class="related-body">${escapeHtml(r.body)}</div>
+        ${r.remarks ? `<div class="related-remarks">${escapeHtml(r.remarks)}</div>` : ''}
+      </div>
+    `;
+  }
+
+  function toggleRelatedHidden(kind, id, hidden){
+    if(kind === 'entry'){
+      toggleEntryHidden(id, hidden);
+      return;
+    }
+    let item = null;
+    if(kind === 'stat'){
+      item = stats.find(x => x.id === id);
+      if(item){ item.hidden = hidden; persistStats(); }
+    }else if(kind === 'penalty'){
+      item = penalties.find(x => x.id === id);
+      if(item){ item.hidden = hidden; persistPenalties(); }
+    }
+    if(!item) return;
+    if(document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
+    if(currentPlayerDetailId && !document.getElementById('player-detail-overlay').classList.contains('hidden')){
+      showPlayerDetail(currentPlayerDetailId);
+    }
+  }
+
   document.getElementById('player-detail-close').addEventListener('click', ()=>{
     document.getElementById('player-detail-overlay').classList.add('hidden');
+    currentPlayerDetailId = null;
   });
 
   function showRelatedDetail(kind, id){
@@ -2481,32 +3338,28 @@
     try{
       const res = await window.storage.get(ANALYSIS_KEY, false);
       analysis = res && res.value ? JSON.parse(res.value) : { home: emptyAnalysis(), away: emptyAnalysis() };
+      if(!analysis || typeof analysis !== 'object' || Array.isArray(analysis)) throw new Error('Ungültige Analysedaten');
     }catch(e){
       analysis = { home: emptyAnalysis(), away: emptyAnalysis() };
     }
     renderAnalysisForm();
   }
 
-  async function persistAnalysis(){
-    try{ await window.storage.set(ANALYSIS_KEY, JSON.stringify(analysis), false); }
-    catch(e){ console.error('Speichern fehlgeschlagen', e); }
-  }
+  async function persistAnalysis(){ return persistKey(ANALYSIS_KEY, analysis, 'Team-Analyse'); }
 
   /* ---------- Formvergleich ---------- */
   async function loadTeamFormData(){
     try{
       const res = await window.storage.get(FORM_KEY, false);
       teamForm = res && res.value ? JSON.parse(res.value) : { home: emptyTeamForm(), away: emptyTeamForm() };
+      if(!teamForm || typeof teamForm !== 'object' || Array.isArray(teamForm)) throw new Error('Ungültige Formdaten');
     }catch(e){
       teamForm = { home: emptyTeamForm(), away: emptyTeamForm() };
     }
     renderTeamFormPage();
   }
 
-  async function persistTeamForm(){
-    try{ await window.storage.set(FORM_KEY, JSON.stringify(teamForm), false); }
-    catch(e){ console.error('Speichern fehlgeschlagen', e); }
-  }
+  async function persistTeamForm(){ return persistKey(FORM_KEY, teamForm, 'Formvergleich'); }
 
   function computeGoalDiff(goals, conceded){
     const g = parseFloat(String(goals).trim().replace(',', '.'));
@@ -2717,16 +3570,14 @@
     try{
       const res = await window.storage.get(H2H_KEY, false);
       h2h = res && res.value ? JSON.parse(res.value) : [];
+      if(!Array.isArray(h2h)) throw new Error('Ungültige Direktvergleichsdaten');
     }catch(e){
       h2h = [];
     }
     renderH2HList();
   }
 
-  async function persistH2H(){
-    try{ await window.storage.set(H2H_KEY, JSON.stringify(h2h), false); }
-    catch(e){ console.error('Speichern fehlgeschlagen', e); }
-  }
+  async function persistH2H(){ return persistKey(H2H_KEY, h2h, 'Direktvergleich'); }
 
   function parseScore(score){
     const m = String(score || '').trim().match(/^(\d+)\s*:\s*(\d+)$/);
@@ -2759,9 +3610,9 @@
   function h2hCardColor(entry){
     const g = h2hCurrentGoals(entry);
     if(!g) return null;
-    if(g.home > g.away) return '#2ac6b3';
-    if(g.home < g.away) return '#f35561';
-    return '#a1a9b6';
+    if(g.home > g.away) return '#6aa0ff';
+    if(g.home < g.away) return '#FE7402';
+    return '#a6aec6';
   }
 
   function h2hSummary(){
@@ -2836,6 +3687,7 @@
   }
 
   function renderH2HList(){
+    renderH2HDashboard();
     const list = document.getElementById('h2h-list');
     const countBadge = document.getElementById('h2h-count-badge');
     const summaryBox = document.getElementById('h2h-summary');
@@ -2881,6 +3733,78 @@
         </div>
       `;
     }).join('');
+  }
+
+  function h2hDashboardCardHtml(entry, isHidden){
+    const parsed = parseScore(entry.score);
+    const homeWon = parsed && parsed.a > parsed.b;
+    const awayWon = parsed && parsed.b > parsed.a;
+    const color = h2hCardColor(entry);
+    const dateLabel = formatH2HDate(entry.date);
+    const actionBtn = isHidden
+      ? `<button type="button" class="related-hide-btn" title="Duell wieder einblenden" onclick="toggleH2HHidden('${entry.id}', false)">↺</button>`
+      : `<button type="button" class="related-hide-btn" title="Duell ausblenden" onclick="toggleH2HHidden('${entry.id}', true)">✕</button>`;
+    return `
+      <div class="card${isHidden ? ' is-hidden' : ''}"${color ? ` style="--tag-color:${color}"` : ''}>
+        ${actionBtn}
+        <div class="card-top">
+          <span class="card-title">${dateLabel ? escapeHtml(dateLabel) : 'Ohne Datum'}${entry.competition ? ' · ' + escapeHtml(entry.competition) : ''}</span>
+        </div>
+        <div class="h2h-score-row">
+          <span class="h2h-team${homeWon ? ' h2h-winner' : ''}">${escapeHtml(entry.homeTeam || '–')}</span>
+          <span class="h2h-score">${escapeHtml(entry.score || '–')}</span>
+          <span class="h2h-team${awayWon ? ' h2h-winner' : ''}">${escapeHtml(entry.awayTeam || '–')}</span>
+        </div>
+        ${entry.remarks ? `<div class="remarks-line">Bemerkung: ${escapeHtml(entry.remarks)}</div>` : ''}
+      </div>
+    `;
+  }
+
+  function h2hHiddenToggleHtml(hiddenEntries){
+    if(!hiddenEntries.length) return '';
+    const count = hiddenEntries.length;
+    return `
+      <details class="hidden-entries-toggle">
+        <summary>${count} ausgeblendete${count === 1 ? 's Duell' : ' Duelle'} anzeigen</summary>
+        <div class="hidden-entries-list">${hiddenEntries.map(entry => h2hDashboardCardHtml(entry, true)).join('')}</div>
+      </details>
+    `;
+  }
+
+  function toggleH2HHidden(id, hidden){
+    const entry = h2h.find(x => x.id === id);
+    if(!entry) return;
+    entry.hidden = hidden;
+    persistH2H();
+    renderH2HDashboard();
+  }
+
+  function renderH2HDashboard(){
+    const summaryBox = document.getElementById('dashboard-h2h-summary');
+    const listBox = document.getElementById('dashboard-h2h-list');
+    if(!summaryBox || !listBox) return;
+
+    if(h2h.length === 0){
+      summaryBox.innerHTML = '';
+      listBox.innerHTML = '<div class="empty">Noch keine vergangenen Duelle erfasst.</div>';
+      return;
+    }
+
+    const sum = h2hSummary();
+    summaryBox.innerHTML = `
+      <div class="h2h-summary-chip"><span class="n">${sum.homeWins}</span><span class="l">${escapeHtml(teams.home || 'Heim')} Siege</span></div>
+      <div class="h2h-summary-chip"><span class="n">${sum.draws}</span><span class="l">Unentschieden</span></div>
+      <div class="h2h-summary-chip"><span class="n">${sum.awayWins}</span><span class="l">${escapeHtml(teams.away || 'Gast')} Siege</span></div>
+    `;
+
+    const sorted = [...h2h].sort((a,b)=> h2hSortKey(b.date).localeCompare(h2hSortKey(a.date)));
+    const visible = sorted.filter(entry => !entry.hidden);
+    const hidden = sorted.filter(entry => entry.hidden);
+
+    const visibleHtml = visible.length
+      ? visible.map(entry => h2hDashboardCardHtml(entry, false)).join('')
+      : '<div class="empty">Alle Duelle sind ausgeblendet.</div>';
+    listBox.innerHTML = visibleHtml + h2hHiddenToggleHtml(hidden);
   }
 
   function renderAnalysisForm(){
@@ -3107,6 +4031,7 @@
     const status = document.getElementById('matchday-status');
     try{
       await window.storage.set(MATCHDAY_KEY, JSON.stringify(matchday), false);
+      await syncOfficialsFromMatchday();
       status.textContent = 'Gespeichert ✓';
     }catch(err){
       status.textContent = 'Fehler beim Speichern (Bild evtl. zu groß)';
@@ -3120,7 +4045,7 @@
   function getCombinedRecords(){
     const factRecords = entries.map(en => ({
       id: en.id, title: en.title, category: en.category, color: en.color || null,
-      body: en.text, meta: en.team || null, remarks: en.remarks || null
+      body: en.text, meta: [en.team, en.season].filter(Boolean).join(' · ') || null, remarks: en.remarks || null
     }));
     const statRecords = stats.map(s => ({
       id: s.id, title: s.name, category: 'Statistik', color: s.color || null,
@@ -3128,7 +4053,7 @@
     }));
     const penaltyRecords = penalties.map(p => ({
       id: p.id, title: p.name, category: 'Strafe', color: p.color || null,
-      body: `Gelb: ${p.gelb} · 2 Min: ${p.zweimin} · Rot: ${p.rot}`, meta: p.team || null, remarks: p.remarks || null
+      body: `Gelb: ${p.gelb} · 2 Min: ${p.zweimin} · Rot: ${p.rot}`, meta: [p.team, p.season].filter(Boolean).join(' · ') || null, remarks: p.remarks || null
     }));
     const h2hRecords = h2h.map(entry => ({
       id: entry.id, title: `${entry.homeTeam || '–'} ${entry.score || ''} ${entry.awayTeam || '–'}`.trim(),
@@ -3210,22 +4135,61 @@
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   document.getElementById('export-btn').addEventListener('click', exportAllData);
+
+  /* ---------- Alles löschen ---------- */
+  document.getElementById('wipe-btn').addEventListener('click', async ()=>{
+    const ok1 = await showConfirm(
+      'Alles löschen? Gelöscht werden Spieler, Einträge, Statistiken, Strafen, Analyse, Form, Vergleich, Spieltag (Offizielle, Bilder) und die Teams. Das lässt sich nicht rückgängig machen. Tipp: vorher „Exportieren“ als Sicherung.'
+    );
+    if(!ok1) return;
+    const ok2 = await showConfirm('Wirklich alles endgültig löschen?');
+    if(!ok2) return;
+    const keys = [STORAGE_KEY, H2H_KEY, STATS_KEY, PENALTIES_KEY, PLAYERS_KEY, TEAMS_KEY, MATCHDAY_KEY, ANALYSIS_KEY, FORM_KEY];
+    // 1) Arbeitsspeicher leeren, damit nichts zurückgeschrieben wird
+    entries = []; stats = []; penalties = []; players = []; h2h = [];
+    teams = { home:'', away:'' };
+    // 2) Speicher leerschreiben UND löschen (manche Umgebungen löschen sonst nur scheinbar)
+    for(const k of keys){
+      try{ await window.storage.set(k, '', false); }catch(e){ console.error('Leeren fehlgeschlagen', k, e); }
+      try{ if(typeof window.storage.delete === 'function') await window.storage.delete(k, false); }catch(e){}
+    }
+    // 3) Zur Sicherheit auch direkt im lokalen Browser-Speicher entfernen (beide Schreibweisen)
+    try{
+      keys.forEach(k => { localStorage.removeItem(k); localStorage.removeItem('kommentatoren-kartei::' + k); });
+    }catch(e){}
+    // 4) Alles frisch aus dem Speicher laden und prüfen, ob wirklich nichts mehr da ist
+    teamForm = { home: emptyTeamForm(), away: emptyTeamForm() };
+    await init();
+    const leftover = [];
+    for(const k of keys){
+      try{
+        const r = await window.storage.get(k, false);
+        if(r && r.value) leftover.push(k);
+      }catch(e){}
+    }
+    if(players.length || entries.length || stats.length || penalties.length || leftover.length){
+      showToast('Löschen hat nicht vollständig funktioniert (' + (leftover.join(', ') || 'Daten noch geladen') + ').', true);
+      return;
+    }
+    switchToPage('input');
+    showToast('Alles gelöscht ✓');
+  });
 
   /* ---------- Druckversion (PDF-fähige HTML-Datei) ---------- */
   const PRINT_CSS = `
     @page{ size: A4; margin: 14mm; }
     *{ box-sizing:border-box; }
     body{ margin:0; background:#e9e9e9; font-family:'IBM Plex Sans', sans-serif; color:#111; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-    .hint-bar{ background:#1b212a; color:#cfd4dc; font-family:'IBM Plex Mono', monospace; font-size:12.5px; text-align:center; padding:10px 16px; line-height:1.5; }
+    .hint-bar{ background:#21232E; color:#cfd4dc; font-family:'IBM Plex Mono', monospace; font-size:12.5px; text-align:center; padding:10px 16px; line-height:1.5; }
     .hint-bar b{ color:#fff; }
     .page{ background:#fff; width:210mm; min-height:297mm; margin:20px auto; padding:14mm; box-shadow:0 4px 24px rgba(0,0,0,0.25); page-break-after:always; position:relative; }
     .page:last-child{ page-break-after:auto; }
-    .doc-header{ display:flex; align-items:flex-end; justify-content:space-between; border-bottom:3px solid #111; padding-bottom:10px; margin-bottom:14px; }
+    .doc-header{ display:flex; align-items:flex-end; justify-content:space-between; border-bottom:3px solid #105BFF; padding-bottom:10px; margin-bottom:14px; }
     .doc-title{ font-family:'Oswald', sans-serif; font-weight:700; font-size:24px; text-transform:uppercase; letter-spacing:0.02em; margin:0; }
-    .doc-title .team-tag{ font-size:12px; font-weight:600; letter-spacing:0.08em; color:#c81e2c; display:block; margin-bottom:2px; }
+    .doc-title .team-tag{ font-size:12px; font-weight:600; letter-spacing:0.08em; color:#105BFF; display:block; margin-bottom:2px; }
     .doc-meta{ text-align:right; font-size:11px; color:#444; line-height:1.5; }
     .doc-meta b{ color:#111; }
     .officials-bar{ display:flex; border:1px solid #ccc; border-radius:4px; margin-bottom:16px; overflow:hidden; }
@@ -3234,7 +4198,7 @@
     .officials-bar span{ display:block; font-family:'IBM Plex Mono', monospace; font-size:9px; text-transform:uppercase; letter-spacing:0.06em; color:#888; margin-bottom:2px; }
     .officials-bar b{ font-size:12px; }
     .liveticker-line{ font-family:'IBM Plex Mono', monospace; font-size:10px; color:#888; margin:-8px 0 16px; }
-    h2.section{ font-family:'Oswald', sans-serif; font-size:14px; text-transform:uppercase; letter-spacing:0.06em; background:#111; color:#fff; padding:5px 10px; margin:0 0 10px; }
+    h2.section{ font-family:'Oswald', sans-serif; font-size:14px; text-transform:uppercase; letter-spacing:0.06em; background:#21232E; color:#fff; padding:5px 10px; margin:0 0 10px; }
     .analysis-block{ display:grid; grid-template-columns:140px 1fr; gap:6px 14px; font-size:12px; margin-bottom:18px; }
     .analysis-block .lbl{ font-family:'IBM Plex Mono', monospace; font-size:10px; text-transform:uppercase; color:#777; padding-top:2px; }
     .analysis-block .val{ line-height:1.5; padding:3px 0; border-bottom:1px dotted #ddd; }
@@ -3337,8 +4301,8 @@
     if(rows.length === 0) return '<div class="empty-hint">Keine Strafen erfasst.</div>';
     return `
       <table class="data">
-        <thead><tr><th>Name</th><th>Gelb</th><th>2 Minuten</th><th>Rot</th></tr></thead>
-        <tbody>${rows.map(p => `<tr><td class="name">${escapeHtml(p.name)}</td><td class="num-cell">${p.gelb}</td><td class="num-cell">${p.zweimin}</td><td class="num-cell">${p.rot}</td></tr>`).join('')}</tbody>
+        <thead><tr><th>Name</th><th>Gelb</th><th>2 Minuten</th><th>Rot</th><th>Saison</th></tr></thead>
+        <tbody>${rows.map(p => `<tr><td class="name">${escapeHtml(p.name)}</td><td class="num-cell">${p.gelb}</td><td class="num-cell">${p.zweimin}</td><td class="num-cell">${p.rot}</td><td>${pd(p.season)}</td></tr>`).join('')}</tbody>
       </table>
     `;
   }
@@ -3350,7 +4314,7 @@
       <div class="facts-list">
         ${rows.map(en => `
           <div class="fact-item">
-            <span class="fact-tag">${escapeHtml(en.category)}</span>
+            <span class="fact-tag">${escapeHtml(en.category)}${en.season ? ' · ' + escapeHtml(en.season) : ''}</span>
             <span class="fact-body">${en.player ? `<b>${escapeHtml(en.player)}</b> — ` : ''}${escapeHtml(en.text)}</span>
           </div>
         `).join('')}
@@ -3472,7 +4436,8 @@ ${pagesHtml}
       await persistStats();
       await persistPenalties();
       await persistPlayers();
-      try{ await window.storage.set(MATCHDAY_KEY, JSON.stringify(matchday), false); }catch(err){}
+      try{ await window.storage.set(MATCHDAY_KEY, JSON.stringify(matchday), false); }
+      catch(err){ console.error('Spieltagsdaten konnten nicht gespeichert werden', err); showToast('Spieltagsdaten konnten nicht gespeichert werden.', true); }
       await persistAnalysis();
       await persistTeamForm();
       await persistH2H();
@@ -3488,6 +4453,8 @@ ${pagesHtml}
       renderH2HList();
       renderChips();
       renderResults();
+      renderQuickStatRoster();
+      renderQuickPenaltyRoster();
 
       if(teams.home && teams.away){ showApp(); } else { showSetup(false); }
 
@@ -3496,6 +4463,778 @@ ${pagesHtml}
       showToast('Die Datei konnte nicht gelesen werden. Bitte stelle sicher, dass es eine gültige Export-Datei aus dieser Kartei ist.', true);
     }
     e.target.value = '';
+  });
+
+  /* ---------- Spieler-Import (Zusammenführen, ohne Überschreiben der Kartei) ---------- */
+  const PIMP_FORMAT = 'kartei-spieler';
+  const PIMP_ROLES = ['Trainer','Co-Trainer','Torwart-Trainer','Physio','Teambetreuer','Schiri 1','Schiri 2','Zeitnehmer','Sekretär'];
+  const PIMP_STATUS = ['Fit','Fraglich','Verletzt','Gesperrt'];
+  const PIMP_PROFILE_FIELDS = ['height','contract','position','nationality','lastClub','transferDate','birthDate'];
+  const PIMP_LABELS = {
+    slot:'Nummer/Rolle', age:'Alter', height:'Größe', contract:'Vertrag bis', position:'Position',
+    nationality:'Nationalität', lastClub:'Letzter Verein', transferDate:'Wechseldatum', birthDate:'Geburtstag',
+    status:'Status', statusNote:'Status-Notiz', milestoneCurrent:'Meilenstein-Stand', milestoneTarget:'Ziel-Meilenstein'
+  };
+  let pimp = { records:[], errors:[], warnings:[], mapping:{}, fileName:'' };
+
+  function pimpNorm(s){
+    return String(s == null ? '' : s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase()
+      .replace(/ß/g,'ss').replace(/[^a-z0-9]+/g,' ').trim();
+  }
+  // Für Vergleiche nur Schreibvarianten wie Akzente/Umlaute vereinheitlichen.
+  // Unterschiedliche Namen (z. B. Lara und Laura) bleiben bewusst verschieden.
+  function statNameNorm(s){ return pimpNorm(s); }
+
+  function pimpParseDate(s){
+    s = String(s || '').trim();
+    let m, d, mo, y;
+    if((m = s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/))){ d = +m[1]; mo = +m[2]; y = +m[3]; }
+    else if((m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/))){ y = +m[1]; mo = +m[2]; d = +m[3]; }
+    else return null;
+    const dt = new Date(y, mo - 1, d);
+    if(dt.getFullYear() !== y || dt.getMonth() !== mo - 1 || dt.getDate() !== d) return null;
+    return { display: String(d).padStart(2,'0') + '.' + String(mo).padStart(2,'0') + '.' + y, date: dt };
+  }
+
+  function pimpAgeFrom(dt){
+    const now = new Date();
+    let a = now.getFullYear() - dt.getFullYear();
+    const m = now.getMonth() - dt.getMonth();
+    if(m < 0 || (m === 0 && now.getDate() < dt.getDate())) a--;
+    return a;
+  }
+
+  function pimpNormalizeRecord(raw, idx){
+    if(!raw || typeof raw !== 'object' || Array.isArray(raw)) return { error:'Eintrag ist kein Objekt', idx };
+    const str = k => raw[k] == null ? '' : String(raw[k]).trim();
+    const name = str('name');
+    const team = str('team');
+    if(!name || !team) return { error:'Name oder Team fehlt', idx, name };
+    const warn = [];
+
+    let role = str('role');
+    if(role){
+      const hit = PIMP_ROLES.find(r => pimpNorm(r) === pimpNorm(role));
+      if(!hit) return { error:'Unbekannte Rolle „' + role + '"', idx, name };
+      role = hit;
+    }
+    let number = str('number').replace(/^#/, '');
+    if(role) number = '';
+    else if(number && !/^\d{1,3}$/.test(number)){ warn.push('Nummer „' + number + '" ungültig – ignoriert'); number = ''; }
+
+    let status = str('status');
+    if(status){
+      const hit = PIMP_STATUS.find(s => pimpNorm(s) === pimpNorm(status));
+      if(hit) status = hit; else { warn.push('Status „' + status + '" unbekannt – ignoriert'); status = ''; }
+    }
+
+    let birthDate = '';
+    let age = str('age');
+    const bd = str('birthDate');
+    if(bd){
+      const p = pimpParseDate(bd);
+      if(p){ birthDate = p.display; age = String(pimpAgeFrom(p.date)); }
+      else warn.push('Geburtstag „' + bd + '" nicht lesbar – ignoriert');
+    }
+    if(age && !/^\d{1,2}$/.test(age)){ warn.push('Alter „' + age + '" ungültig – ignoriert'); age = ''; }
+
+    let height = str('height').replace(/\s*cm$/i, '');
+    if(height && !/^\d{2,3}$/.test(height)){ warn.push('Größe „' + height + '" ungültig – ignoriert'); height = ''; }
+
+    let transferDate = str('transferDate');
+    if(transferDate){
+      const p = pimpParseDate(transferDate);
+      if(p) transferDate = p.display;
+    }
+
+    return {
+      rec: {
+        name, team, role, number, status, age, birthDate, height, transferDate,
+        contract: str('contract'), position: str('position'), nationality: str('nationality'), lastClub: str('lastClub'),
+        statusNote: str('statusNote'), milestoneCurrent: str('milestoneCurrent'), milestoneTarget: str('milestoneTarget')
+      },
+      warn
+    };
+  }
+
+  function pimpExtractList(data){
+    if(Array.isArray(data)) return data;
+    if(data && typeof data === 'object' && Array.isArray(data.players) &&
+       (data.exportFormat === PIMP_FORMAT || data.exportFormat === 'kommentatoren-kartei')) return data.players;
+    return null;
+  }
+
+  function pimpSuggestMapping(fileTeam){
+    const n = pimpNorm(fileTeam);
+    const matches = t => {
+      const tn = pimpNorm(t);
+      if(!tn || !n) return false;
+      return tn === n;
+    };
+    if(matches(teams.home)) return 'home';
+    if(matches(teams.away)) return 'away';
+    return 'keep';
+  }
+
+  function pimpOpen(fileName, list){
+    const records = [];
+    const errors = [];
+    const warnings = [];
+    const seen = new Set();
+    list.forEach((raw, i) => {
+      const r = pimpNormalizeRecord(raw, i);
+      if(r.error){ errors.push('Eintrag ' + (i + 1) + (r.name ? ' (' + r.name + ')' : '') + ': ' + r.error); return; }
+      const key = pimpNorm(r.rec.team) + '|' + pimpNorm(r.rec.name);
+      if(seen.has(key)){ warnings.push(r.rec.name + ' (' + r.rec.team + ') kommt in der Datei doppelt vor – zweiter Eintrag ignoriert'); return; }
+      seen.add(key);
+      r.warn.forEach(w => warnings.push(r.rec.name + ': ' + w));
+      records.push(r.rec);
+    });
+    if(records.length === 0){
+      showToast(errors.length ? 'Keine gültigen Spieler in der Datei gefunden.' : 'Die Datei enthält keine Spieler.', true);
+      return;
+    }
+    const mapping = {};
+    records.forEach(r => { if(!(r.team in mapping)) mapping[r.team] = pimpSuggestMapping(r.team); });
+    pimp = { records, errors, warnings, mapping, fileName };
+
+    const teamCounts = {};
+    records.forEach(r => { teamCounts[r.team] = (teamCounts[r.team] || 0) + 1; });
+    document.getElementById('pimp-file-info').textContent =
+      fileName + ' · ' + records.length + ' Spieler/Personen in ' + Object.keys(teamCounts).length + ' Team(s). Bestehende Daten bleiben erhalten; es wird nur ergänzt.';
+    document.getElementById('pimp-map').innerHTML = Object.keys(teamCounts).map(t => `
+      <div class="pimp-team">${escapeHtml(t)} <small>(${teamCounts[t]})</small></div>
+      <select data-pimp-team="${escapeHtml(t)}">
+        <option value="home">Heim: ${escapeHtml(teams.home)}</option>
+        <option value="away">Gast: ${escapeHtml(teams.away)}</option>
+        <option value="keep">Als eigenes Team „${escapeHtml(t)}" anlegen</option>
+        <option value="skip">Nicht importieren</option>
+      </select>`).join('');
+    document.querySelectorAll('#pimp-map select').forEach(sel => { sel.value = pimp.mapping[sel.getAttribute('data-pimp-team')]; });
+    document.getElementById('pimp-overwrite').checked = false;
+    pimpRenderResult();
+    document.getElementById('pimp-overlay').classList.remove('hidden');
+  }
+
+  function pimpCompute(){
+    const overwrite = document.getElementById('pimp-overwrite').checked;
+    const res = { added:[], updated:[], kept:[], unchanged:0, skipped:0 };
+    const index = new Map();
+    players.forEach(p => { index.set(pimpNorm(p.team) + '|' + pimpNorm(p.name), p); });
+    const emp = v => v == null || v === '';
+
+    pimp.records.forEach(rec => {
+      const m = pimp.mapping[rec.team] || 'keep';
+      if(m === 'skip'){ res.skipped++; return; }
+      const team = m === 'home' ? teams.home : (m === 'away' ? teams.away : rec.team);
+      const existing = index.get(pimpNorm(team) + '|' + pimpNorm(rec.name));
+
+      if(!existing){
+        const others = players.filter(p => pimpNorm(p.name) === pimpNorm(rec.name) && pimpNorm(p.team) !== pimpNorm(team)).map(p => p.team);
+        res.added.push({ rec, team, others });
+        return;
+      }
+
+      const patch = {};
+      const changes = [];
+      const kept = [];
+      const apply = (field, key, oldV, newV, patchObj) => { Object.assign(patch, patchObj); changes.push({ field, old:oldV, nw:newV }); };
+      const keep = (field, oldV, newV) => { kept.push({ field, old:oldV, nw:newV }); };
+
+      if(rec.role || rec.number){
+        const same = (existing.role || '') === rec.role && (existing.number || '') === rec.number;
+        if(!same){
+          const oldTxt = existing.role || (existing.number ? '#' + existing.number : '');
+          const newTxt = rec.role || ('#' + rec.number);
+          if(!(existing.role || existing.number) || overwrite) apply('slot', 'slot', oldTxt, newTxt, { role:rec.role, number:rec.number });
+          else keep('slot', oldTxt, newTxt);
+        }
+      }
+
+      PIMP_PROFILE_FIELDS.forEach(f => {
+        if(emp(rec[f])) return;
+        const cur = existing[f];
+        if(String(cur == null ? '' : cur) === rec[f]) return;
+        if(emp(cur) || overwrite) apply(f, f, cur || '', rec[f], { [f]: rec[f] });
+        else keep(f, cur, rec[f]);
+      });
+
+      if(rec.age && String(existing.age == null ? '' : existing.age) !== rec.age){
+        if(emp(existing.age) || overwrite || existing.birthDate || (rec.birthDate && patch.birthDate)) apply('age', 'age', existing.age || '', rec.age, { age: rec.age });
+        else keep('age', existing.age, rec.age);
+      }
+
+      if(rec.status && rec.status !== (existing.status || 'Fit')){
+        if(!existing.status || existing.status === 'Fit') apply('status', 'status', existing.status || 'Fit', rec.status, { status: rec.status });
+        else keep('status', existing.status, rec.status);
+      }
+      ['statusNote','milestoneCurrent','milestoneTarget'].forEach(f => {
+        if(emp(rec[f]) || String(existing[f] || '') === rec[f]) return;
+        if(emp(existing[f])) apply(f, f, '', rec[f], { [f]: rec[f] });
+        else keep(f, existing[f], rec[f]);
+      });
+
+      if(changes.length) res.updated.push({ existing, patch, changes });
+      else res.unchanged++;
+      if(kept.length) res.kept.push({ existing, kept });
+    });
+    return res;
+  }
+
+  function pimpFieldVal(field, v){
+    return v === '' || v == null ? '–' : escapeHtml(v);
+  }
+
+  function pimpRenderResult(){
+    const res = pimpCompute();
+    const chips = `
+      <div class="pimp-summary">
+        <span class="pimp-chip new"><b>${res.added.length}</b> neu</span>
+        <span class="pimp-chip upd"><b>${res.updated.length}</b> ergänzt/aktualisiert</span>
+        <span class="pimp-chip"><b>${res.unchanged}</b> unverändert</span>
+        ${res.skipped ? `<span class="pimp-chip"><b>${res.skipped}</b> übersprungen</span>` : ''}
+        ${pimp.errors.length ? `<span class="pimp-chip err"><b>${pimp.errors.length}</b> fehlerhaft</span>` : ''}
+      </div>`;
+
+    const addedHtml = res.added.length ? `
+      <details class="pimp-detail" ${res.added.length <= 12 ? 'open' : ''}><summary>Neue Spieler (${res.added.length})</summary><ul>
+        ${res.added.map(a => `<li><b>${escapeHtml(a.rec.role || (a.rec.number ? '#' + a.rec.number : ''))} ${escapeHtml(a.rec.name)}</b> · ${escapeHtml(a.team)}${a.rec.position ? ' · ' + escapeHtml(a.rec.position) : ''}${a.others.length ? ' · <i>gleicher Name auch bei: ' + escapeHtml(a.others.join(', ')) + '</i>' : ''}</li>`).join('')}
+      </ul></details>` : '';
+
+    const updatedHtml = res.updated.length ? `
+      <details class="pimp-detail" ${res.updated.length <= 8 ? 'open' : ''}><summary>Ergänzungen bei bestehenden Spielern (${res.updated.length})</summary><ul>
+        ${res.updated.map(u => `<li><b>${escapeHtml(u.existing.name)}</b> (${escapeHtml(u.existing.team)}): ${u.changes.map(c => `${PIMP_LABELS[c.field]} ${c.old ? `<span class="pimp-old">${pimpFieldVal(c.field, c.old)}</span> → ` : ''}${pimpFieldVal(c.field, c.nw)}`).join('; ')}</li>`).join('')}
+      </ul></details>` : '';
+
+    const keptHtml = res.kept.length ? `
+      <details class="pimp-detail"><summary>Abweichende Werte, die nicht übernommen werden (${res.kept.length} Spieler)</summary><ul>
+        ${res.kept.map(k => `<li><b>${escapeHtml(k.existing.name)}</b>: ${k.kept.map(c => `${PIMP_LABELS[c.field]}: gespeichert „${pimpFieldVal(c.field, c.old)}", Datei „${pimpFieldVal(c.field, c.nw)}"`).join('; ')}</li>`).join('')}
+      </ul></details>` : '';
+
+    const problems = pimp.errors.concat(pimp.warnings);
+    const problemsHtml = problems.length ? `
+      <details class="pimp-detail"><summary>Hinweise und Fehler (${problems.length})</summary><ul>
+        ${problems.map(p => `<li>${escapeHtml(p)}</li>`).join('')}
+      </ul></details>` : '';
+
+    document.getElementById('pimp-result').innerHTML = chips + addedHtml + updatedHtml + keptHtml + problemsHtml;
+    document.getElementById('pimp-ok').disabled = (res.added.length + res.updated.length) === 0;
+  }
+
+  function pimpClose(){
+    document.getElementById('pimp-overlay').classList.add('hidden');
+    pimp = { records:[], errors:[], warnings:[], mapping:{}, fileName:'' };
+  }
+
+  async function pimpApply(){
+    const res = pimpCompute();
+    res.updated.forEach(u => Object.assign(u.existing, u.patch));
+    res.added.forEach(a => {
+      const r = a.rec;
+      players.push({
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+        name: r.name, team: a.team, number: r.number, role: r.role, age: r.age, birthDate: r.birthDate,
+        height: r.height, contract: r.contract, position: r.position, nationality: r.nationality,
+        lastClub: r.lastClub, transferDate: r.transferDate, status: r.status || 'Fit', statusNote: r.statusNote,
+        milestoneCurrent: r.milestoneCurrent, milestoneTarget: r.milestoneTarget, createdAt: Date.now()
+      });
+    });
+    await persistPlayers();
+    renderPlayerList();
+    populatePlayerSelect();
+    renderQuickStatRoster();
+    renderQuickPenaltyRoster();
+    if(document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
+    pimpClose();
+    showToast('Spieler-Import fertig: ' + res.added.length + ' neu, ' + res.updated.length + ' ergänzt.');
+  }
+
+  document.getElementById('player-import-input').addEventListener('change', async (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    try{
+      const data = JSON.parse(await file.text());
+      const list = pimpExtractList(data);
+      if(!list) throw new Error('invalid-format');
+      pimpOpen(file.name, list);
+    }catch(err){
+      showToast('Die Datei konnte nicht gelesen werden. Erwartet wird eine Spieler-Datei (Format „kartei-spieler") oder eine Kartei-Export-Datei.', true);
+    }
+    e.target.value = '';
+  });
+  document.getElementById('pimp-map').addEventListener('change', (e)=>{
+    const sel = e.target.closest('select[data-pimp-team]');
+    if(!sel) return;
+    pimp.mapping[sel.getAttribute('data-pimp-team')] = sel.value;
+    pimpRenderResult();
+  });
+  document.getElementById('pimp-overwrite').addEventListener('change', pimpRenderResult);
+  document.getElementById('pimp-cancel').addEventListener('click', pimpClose);
+  document.getElementById('pimp-ok').addEventListener('click', pimpApply);
+
+  document.getElementById('player-export-btn').addEventListener('click', ()=>{
+    const data = {
+      exportFormat: PIMP_FORMAT,
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      players: players.map(p => ({
+        name: p.name, team: p.team, number: p.number || '', role: p.role || '', age: p.age || '', birthDate: p.birthDate || '',
+        height: p.height || '', contract: p.contract || '', position: p.position || '', nationality: p.nationality || '',
+        lastClub: p.lastClub || '', transferDate: p.transferDate || '', status: p.status || 'Fit', statusNote: p.statusNote || '',
+        milestoneCurrent: p.milestoneCurrent || '', milestoneTarget: p.milestoneTarget || ''
+      }))
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'kartei-spieler-' + new Date().toISOString().slice(0,10) + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+
+  /* ---------- Statistik-Import (Zusammenführen, ohne Überschreiben der Kartei) ---------- */
+  const SIMP_FORMAT = 'kartei-statistiken';
+  let simp = { records:[], errors:[], warnings:[], mapping:{}, fileName:'' };
+
+  function simpNormalizeRecord(raw, idx){
+    if(!raw || typeof raw !== 'object' || Array.isArray(raw)) return { error:'Eintrag ist kein Objekt', idx };
+    const str = k => raw[k] == null ? '' : String(raw[k]).trim();
+    const name = str('name');
+    const team = str('team');
+    const value = str('value');
+    if(!name || !team) return { error:'Name oder Team fehlt', idx, name };
+    if(!value) return { error:'Wert fehlt', idx, name };
+    if(name.length > 160 || team.length > 160 || value.length > 500 || str('statType').length > 120 || str('season').length > 120 || str('remarks').length > 2000){
+      return { error:'Ein Feld überschreitet die erlaubte Länge', idx, name };
+    }
+    return { rec: { name, team, statType: str('statType') || 'Wert', value, season: str('season'), remarks: str('remarks') } };
+  }
+
+  function simpExtractList(data){
+    if(Array.isArray(data)) return data;
+    if(data && typeof data === 'object' && Array.isArray(data.stats) &&
+       (data.exportFormat === SIMP_FORMAT || data.exportFormat === 'kommentatoren-kartei')) return data.stats;
+    return null;
+  }
+
+  function simpSeasonFor(rec){
+    const mode = document.getElementById('simp-season').value;
+    if(mode === 'game') return LAST_GAME_LABEL;
+    if(mode === 'game2') return 'Vorletztes Spiel';
+    if(mode === 'game3') return 'Drittletztes Spiel';
+    if(mode === 'matchday'){
+      const n = document.getElementById('simp-matchday').value.replace(/\D/g, '');
+      return n ? 'Spieltag ' + parseInt(n, 10) : rec.season;
+    }
+    if(mode === 'season') return seasonLabel(0);
+    return rec.season;
+  }
+
+  function simpOpen(fileName, list){
+    const records = [], errors = [], warnings = [], seen = new Set();
+    list.forEach((raw, i) => {
+      const r = simpNormalizeRecord(raw, i);
+      if(r.error){ errors.push('Eintrag ' + (i + 1) + (r.name ? ' (' + r.name + ')' : '') + ': ' + r.error); return; }
+      const key = [r.rec.team, r.rec.name, r.rec.statType, r.rec.season].map(pimpNorm).join('|');
+      if(seen.has(key)){ warnings.push(r.rec.name + ' – ' + r.rec.statType + ' (' + r.rec.team + ') kommt in der Datei doppelt vor – zweiter Eintrag ignoriert'); return; }
+      seen.add(key);
+      records.push(r.rec);
+    });
+    if(records.length === 0){
+      showToast(errors.length ? 'Keine gültigen Statistiken in der Datei gefunden.' : 'Die Datei enthält keine Statistiken.', true);
+      return;
+    }
+    const mapping = {};
+    records.forEach(r => { if(!(r.team in mapping)) mapping[r.team] = pimpSuggestMapping(r.team); });
+    simp = { records, errors, warnings, mapping, fileName };
+
+    const teamCounts = {};
+    records.forEach(r => { teamCounts[r.team] = (teamCounts[r.team] || 0) + 1; });
+    document.getElementById('simp-file-info').textContent =
+      fileName + ' · ' + records.length + ' Statistiken in ' + Object.keys(teamCounts).length + ' Team(s). Bestehende Daten bleiben erhalten; es wird nur ergänzt.';
+    document.getElementById('simp-map').innerHTML = Object.keys(teamCounts).map(t => `
+      <div class="pimp-team">${escapeHtml(t)} <small>(${teamCounts[t]})</small></div>
+      <select data-simp-team="${escapeHtml(t)}">
+        <option value="home">Heim: ${escapeHtml(teams.home)}</option>
+        <option value="away">Gast: ${escapeHtml(teams.away)}</option>
+        <option value="keep">Als eigenes Team „${escapeHtml(t)}" anlegen</option>
+        <option value="skip">Nicht importieren</option>
+      </select>`).join('');
+    document.querySelectorAll('#simp-map select').forEach(sel => { sel.value = simp.mapping[sel.getAttribute('data-simp-team')]; });
+    document.getElementById('simp-season-opt').textContent = 'Diese Saison (' + seasonLabel(0) + ')';
+    document.getElementById('simp-season').value = 'file';
+    document.getElementById('simp-matchday').value = '';
+    simpToggleMatchday();
+    document.getElementById('simp-overwrite').checked = false;
+    simpRenderResult();
+    document.getElementById('simp-overlay').classList.remove('hidden');
+  }
+
+  function simpCompute(){
+    const overwrite = document.getElementById('simp-overwrite').checked;
+    const res = { added:[], updated:[], kept:[], unchanged:0, skipped:0, unknown:new Set() };
+    const index = new Map();
+    const keyOf = (team, name, type, season) => [pimpNorm(team), statNameNorm(name), pimpNorm(type), pimpNorm(season)].join('|');
+    stats.forEach(s => { index.set(keyOf(s.team, s.name, s.statType, s.season), s); });
+    const pending = new Set();
+
+    simp.records.forEach(rec => {
+      const m = simp.mapping[rec.team] || 'keep';
+      if(m === 'skip'){ res.skipped++; return; }
+      const team = m === 'home' ? teams.home : (m === 'away' ? teams.away : rec.team);
+      const season = simpSeasonFor(rec);
+      const rosterPlayer = players.find(p => statNameNorm(p.name) === statNameNorm(rec.name) && pimpNorm(p.team) === pimpNorm(team));
+      const canonicalRec = rosterPlayer ? { ...rec, name: rosterPlayer.name } : rec;
+      const key = keyOf(team, canonicalRec.name, rec.statType, season);
+      if(pending.has(key)){ res.skipped++; return; }
+      pending.add(key);
+
+      if(pimpNorm(rec.name) !== pimpNorm(team) && !rosterPlayer) res.unknown.add(rec.name + ' (' + team + ')');
+
+      const existing = index.get(key);
+      if(!existing){ res.added.push({ rec: canonicalRec, team, season }); return; }
+
+      const patch = {}, changes = [], kept = [];
+      if(String(existing.value) !== rec.value){
+        if(overwrite){ patch.value = rec.value; changes.push({ label:'Wert', old:existing.value, nw:rec.value }); }
+        else kept.push({ label:'Wert', old:existing.value, nw:rec.value });
+      }
+      if(rec.remarks && String(existing.remarks || '') !== rec.remarks){
+        if(!existing.remarks || overwrite){ patch.remarks = rec.remarks; changes.push({ label:'Bemerkung', old:existing.remarks || '', nw:rec.remarks }); }
+        else kept.push({ label:'Bemerkung', old:existing.remarks, nw:rec.remarks });
+      }
+      if(changes.length) res.updated.push({ existing, patch, changes });
+      else res.unchanged++;
+      if(kept.length) res.kept.push({ existing, kept });
+    });
+    return res;
+  }
+
+  function simpRenderResult(){
+    const res = simpCompute();
+    const v = x => x === '' || x == null ? '–' : escapeHtml(x);
+    const chips = `
+      <div class="pimp-summary">
+        <span class="pimp-chip new"><b>${res.added.length}</b> neu</span>
+        <span class="pimp-chip upd"><b>${res.updated.length}</b> ergänzt/aktualisiert</span>
+        <span class="pimp-chip"><b>${res.unchanged}</b> unverändert</span>
+        ${res.skipped ? `<span class="pimp-chip"><b>${res.skipped}</b> übersprungen</span>` : ''}
+        ${simp.errors.length ? `<span class="pimp-chip err"><b>${simp.errors.length}</b> fehlerhaft</span>` : ''}
+      </div>`;
+
+    const addedHtml = res.added.length ? `
+      <details class="pimp-detail" ${res.added.length <= 12 ? 'open' : ''}><summary>Neue Statistiken (${res.added.length})</summary><ul>
+        ${res.added.map(a => `<li><b>${escapeHtml(a.rec.name)}</b> · ${escapeHtml(a.team)} · ${escapeHtml(a.rec.statType)}: ${escapeHtml(a.rec.value)}${a.season ? ' <i>(' + escapeHtml(a.season) + ')</i>' : ''}</li>`).join('')}
+      </ul></details>` : '';
+    const updatedHtml = res.updated.length ? `
+      <details class="pimp-detail" ${res.updated.length <= 8 ? 'open' : ''}><summary>Änderungen an bestehenden Statistiken (${res.updated.length})</summary><ul>
+        ${res.updated.map(u => `<li><b>${escapeHtml(u.existing.name)}</b> · ${escapeHtml(u.existing.statType)}: ${u.changes.map(c => `${c.label} ${c.old !== '' && c.old != null ? `<span class="pimp-old">${v(c.old)}</span> → ` : ''}${v(c.nw)}`).join('; ')}</li>`).join('')}
+      </ul></details>` : '';
+    const keptHtml = res.kept.length ? `
+      <details class="pimp-detail"><summary>Abweichende Werte, die nicht übernommen werden (${res.kept.length})</summary><ul>
+        ${res.kept.map(k => `<li><b>${escapeHtml(k.existing.name)}</b> · ${escapeHtml(k.existing.statType)}: ${k.kept.map(c => `${c.label}: gespeichert „${v(c.old)}", Datei „${v(c.nw)}"`).join('; ')}</li>`).join('')}
+      </ul></details>` : '';
+    const problems = simp.errors.concat(simp.warnings);
+    if(res.unknown.size) problems.push('Nicht in der Spielerliste (Statistik wird trotzdem angelegt): ' + Array.from(res.unknown).join(', '));
+    const problemsHtml = problems.length ? `
+      <details class="pimp-detail"><summary>Hinweise und Fehler (${problems.length})</summary><ul>
+        ${problems.map(p => `<li>${escapeHtml(p)}</li>`).join('')}
+      </ul></details>` : '';
+
+    document.getElementById('simp-result').innerHTML = chips + addedHtml + updatedHtml + keptHtml + problemsHtml;
+    const mdMissing = document.getElementById('simp-season').value === 'matchday' && !document.getElementById('simp-matchday').value.replace(/\D/g, '');
+    document.getElementById('simp-ok').disabled = mdMissing || (res.added.length + res.updated.length) === 0;
+  }
+
+  function simpClose(){
+    document.getElementById('simp-overlay').classList.add('hidden');
+    simp = { records:[], errors:[], warnings:[], mapping:{}, fileName:'' };
+  }
+
+  async function simpApply(){
+    const res = simpCompute();
+    const before = stats.map(s => ({ ...s }));
+    res.updated.forEach(u => Object.assign(u.existing, u.patch));
+    res.added.forEach((a, i) => {
+      stats.push({
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2,7) + i,
+        name: a.rec.name, team: a.team, color: '', statType: a.rec.statType, value: a.rec.value,
+        season: a.season, remarks: a.rec.remarks, createdAt: Date.now()
+      });
+    });
+    const saved = await persistStats();
+    if(!saved){
+      stats = before;
+      renderStatsList();
+      renderQuickStatRoster();
+      return;
+    }
+    renderStatsList();
+    renderChips();
+    renderResults();
+    renderQuickStatRoster();
+    if(document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
+    simpClose();
+    showToast('Statistik-Import fertig: ' + res.added.length + ' neu, ' + res.updated.length + ' aktualisiert.');
+  }
+
+  document.getElementById('stat-import-input').addEventListener('change', async (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    try{
+      const data = JSON.parse(await file.text());
+      const list = simpExtractList(data);
+      if(!list) throw new Error('invalid-format');
+      simpOpen(file.name, list);
+    }catch(err){
+      showToast('Die Datei konnte nicht gelesen werden. Erwartet wird eine Statistik-Datei (Format „kartei-statistiken") oder eine Kartei-Export-Datei.', true);
+    }
+    e.target.value = '';
+  });
+  document.getElementById('simp-map').addEventListener('change', (e)=>{
+    const sel = e.target.closest('select[data-simp-team]');
+    if(!sel) return;
+    simp.mapping[sel.getAttribute('data-simp-team')] = sel.value;
+    simpRenderResult();
+  });
+  function simpToggleMatchday(){
+    const on = document.getElementById('simp-season').value === 'matchday';
+    document.getElementById('simp-md-label').classList.toggle('hidden', !on);
+    document.getElementById('simp-matchday').classList.toggle('hidden', !on);
+  }
+  document.getElementById('simp-season').addEventListener('change', ()=>{
+    simpToggleMatchday();
+    if(document.getElementById('simp-season').value === 'matchday') document.getElementById('simp-matchday').focus();
+    simpRenderResult();
+  });
+  document.getElementById('simp-matchday').addEventListener('input', simpRenderResult);
+  document.getElementById('simp-overwrite').addEventListener('change', simpRenderResult);
+  document.getElementById('simp-cancel').addEventListener('click', simpClose);
+  document.getElementById('simp-ok').addEventListener('click', simpApply);
+
+  document.getElementById('stat-export-btn').addEventListener('click', ()=>{
+    const data = {
+      exportFormat: SIMP_FORMAT,
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      stats: stats.map(s => ({
+        name: s.name, team: s.team || '', statType: s.statType, value: s.value, season: s.season || '', remarks: s.remarks || ''
+      }))
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'kartei-statistiken-' + new Date().toISOString().slice(0,10) + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  /* ---------- Tastatur-Navigation ---------- */
+  /* ← → wechseln das Menü, 1–9 springen direkt, E/D wechseln zwischen Erfassen und Dashboard,
+     / öffnet die Suche, ? zeigt die Übersicht. Greift nicht, solange man tippt oder ein Fenster offen ist. */
+  const KEYNAV_HINT = '← → Menü wechseln · 1–9 Menü direkt · E Erfassen · D Dashboard · / Suche';
+  function keynavVisibleTabs(){
+    return Array.from(document.querySelectorAll('.tab')).filter(t => !t.classList.contains('hidden'));
+  }
+  function keynavGo(tab){
+    if(!tab) return;
+    switchToPage(tab.dataset.page);
+    tab.scrollIntoView({ block:'nearest', inline:'nearest' });
+    window.scrollTo({ top:0 });
+  }
+  function keynavBlocked(e){
+    if(e.ctrlKey || e.metaKey || e.altKey || e.isComposing) return true;
+    if(document.getElementById('app-shell').classList.contains('hidden')) return true;
+    const el = e.target;
+    if(el && el.closest && el.closest('input, textarea, select, [contenteditable=""], [contenteditable="true"]')) return true;
+    if(document.querySelector('.confirm-overlay:not(.hidden), .lightbox-overlay:not(.hidden), #season-picker-popup')) return true;
+    return false;
+  }
+  function keynavUpdateTitles(){
+    keynavVisibleTabs().forEach((t, i) => { t.title = 'Taste ' + (i + 1); });
+  }
+  const _applyModeBase = applyMode;
+  applyMode = function(mode){ _applyModeBase(mode); keynavUpdateTitles(); };
+  keynavUpdateTitles();
+
+  /* ---------- Spieler per Tastatur (Dashboard) ---------- */
+  const KN_LISTS = { home:'dashboard-home-list', away:'dashboard-away-list', officials:'dashboard-officials-list' };
+  const kn = { team:null, id:null, buf:'', timer:null };
+  const knDashActive = () => document.getElementById('page-dashboard').classList.contains('active');
+  function knView(){
+    const a = document.querySelector('.dashboard-subview.active');
+    return a ? a.id.replace(/^dashboard-/, '').replace(/-view$/, '') : '';
+  }
+  function knCards(team){
+    const l = document.getElementById(KN_LISTS[team]);
+    return l ? Array.from(l.querySelectorAll('.player-card')) : [];
+  }
+  function knTeamOfCard(card){
+    const l = card && card.closest('.dashboard-player-list');
+    return l ? (Object.keys(KN_LISTS).find(k => KN_LISTS[k] === l.id) || null) : null;
+  }
+  function knApplyHighlight(){
+    document.querySelectorAll('.player-card.kn-selected').forEach(x => x.classList.remove('kn-selected'));
+    if(!kn.id) return;
+    const c = document.querySelector('.player-card[data-id="' + kn.id + '"]');
+    if(c) c.classList.add('kn-selected');
+  }
+  function knSelect(card){
+    kn.id = card ? card.dataset.id : null;
+    knApplyHighlight();
+    if(card) card.scrollIntoView({ block:'nearest' });
+  }
+  function knEnsureTeam(){
+    const v = knView();
+    if(v === 'officials'){ if(kn.team !== 'officials'){ kn.team = 'officials'; knSelect(knCards('officials')[0] || null); } return true; }
+    if(v === 'teams'){
+      if(kn.team !== 'home' && kn.team !== 'away'){
+        const cur = kn.id && document.querySelector('.player-card[data-id="' + kn.id + '"]');
+        kn.team = (cur && knTeamOfCard(cur)) || 'home';
+        if(!cur || knTeamOfCard(cur) !== kn.team) knSelect(knCards(kn.team)[0] || null);
+      }
+      return true;
+    }
+    return false;
+  }
+  function knShowTeam(team){
+    if(!knDashActive()){
+      applyMode('overview');
+      keynavGo(document.querySelector('.tab[data-page="dashboard"]'));
+    }
+    const btn = document.getElementById(team === 'officials' ? 'dash-view-officials-btn' : 'dash-view-teams-btn');
+    if(!btn.classList.contains('active')) btn.click();
+    kn.team = team; kn.buf = '';
+    const cards = knCards(team);
+    knSelect(cards[0] || null);
+    if(!cards.length) showToast('Keine Einträge in dieser Liste.', true);
+  }
+  function knMove(step){
+    const cards = knCards(kn.team);
+    if(!cards.length) return;
+    let i = cards.findIndex(c => c.dataset.id === kn.id);
+    i = i < 0 ? 0 : Math.min(cards.length - 1, Math.max(0, i + step));
+    knSelect(cards[i]);
+  }
+  function knDigit(d){
+    clearTimeout(kn.timer);
+    kn.buf = (kn.buf + d).slice(-3);
+    kn.timer = setTimeout(()=>{ kn.buf = ''; }, 1100);
+    const cards = knCards(kn.team);
+    const num = c => { const p = players.find(x => x.id === c.dataset.id); return p && !p.role ? String(p.number || '') : ''; };
+    const hit = cards.find(c => num(c) === kn.buf) || cards.find(c => num(c).startsWith(kn.buf));
+    if(hit) knSelect(hit);
+    else { showToast('Keine Nr. ' + kn.buf + ' in dieser Liste', true); kn.buf = ''; }
+  }
+  function knDetailStep(step){
+    const cur = document.querySelector('.player-card[data-id="' + currentPlayerDetailId + '"]');
+    if(!cur) return;
+    const cards = Array.from(cur.closest('.dashboard-player-list').querySelectorAll('.player-card'));
+    if(cards.length < 2) return;
+    const next = cards[(cards.indexOf(cur) + step + cards.length) % cards.length];
+    showPlayerDetail(next.dataset.id);
+    knSelect(next);
+    const box = document.querySelector('#player-detail-overlay .player-detail-box');
+    if(box) box.scrollTop = 0;
+  }
+  const KN_VIEWS = { t:'teams', a:'analysis', f:'form', v:'h2h', b:'photos' };
+
+  /* liefert true, wenn die Taste hier verarbeitet wurde */
+  function keynavPlayerKeys(e){
+    if(e.ctrlKey || e.metaKey || e.altKey || e.isComposing) return false;
+    const k = e.key;
+    const det = document.getElementById('player-detail-overlay');
+    if(!det.classList.contains('hidden')){
+      if(document.querySelector('.confirm-overlay:not(.hidden):not(#player-detail-overlay), .lightbox-overlay:not(.hidden)')) return false;
+      if(k === 'ArrowRight' || k === 'ArrowLeft'){ e.preventDefault(); knDetailStep(k === 'ArrowRight' ? 1 : -1); return true; }
+      if(k === 'Escape'){ e.preventDefault(); document.getElementById('player-detail-close').click(); return true; }
+      return false;
+    }
+    if(keynavBlocked(e)) return false;
+    const lk = k.length === 1 ? k.toLowerCase() : k;
+
+    if(lk === 'h'){ e.preventDefault(); knShowTeam('home'); return true; }
+    if(lk === 'g'){ e.preventDefault(); knShowTeam('away'); return true; }
+    if(lk === 'o'){ e.preventDefault(); knShowTeam('officials'); return true; }
+    if(!knDashActive()) return false;
+
+    if(KN_VIEWS[lk]){
+      e.preventDefault();
+      const btn = document.getElementById('dash-view-' + KN_VIEWS[lk] + '-btn');
+      if(btn) btn.click();
+      kn.team = null; kn.buf = '';
+      return true;
+    }
+    const v = knView();
+    if(v !== 'teams' && v !== 'officials') return false;
+
+    if(k === 'ArrowDown' || k === 'ArrowUp'){
+      e.preventDefault();
+      const fresh = !kn.team || !(v === 'officials' ? kn.team === 'officials' : (kn.team === 'home' || kn.team === 'away'));
+      knEnsureTeam();
+      if(!fresh) knMove(k === 'ArrowDown' ? 1 : -1);
+      return true;
+    }
+    if(/^[0-9]$/.test(k) && kn.team && (v === 'officials' ? kn.team === 'officials' : (kn.team === 'home' || kn.team === 'away'))){
+      e.preventDefault(); knDigit(k); return true;
+    }
+    if((k === 'Enter' || k === ' ') && kn.id && !(e.target.closest && e.target.closest('button, a, summary'))){
+      e.preventDefault(); showPlayerDetail(kn.id); return true;
+    }
+    if(k === 'Escape' && kn.id){ e.preventDefault(); kn.id = null; kn.team = null; kn.buf = ''; knApplyHighlight(); return true; }
+    return false;
+  }
+
+  const _renderDashboardBase = renderDashboard;
+  renderDashboard = function(){ _renderDashboardBase(); knApplyHighlight(); };
+  const _showPlayerDetailBase = showPlayerDetail;
+  showPlayerDetail = function(id){
+    _showPlayerDetailBase(id);
+    kn.id = id;
+    const c = document.querySelector('.player-card[data-id="' + id + '"]');
+    if(c) kn.team = knTeamOfCard(c);
+    knApplyHighlight();
+  };
+  document.getElementById('kn-help-close').addEventListener('click', ()=> document.getElementById('kn-help-overlay').classList.add('hidden'));
+
+  document.addEventListener('keydown', (e)=>{
+    const help = document.getElementById('kn-help-overlay');
+    if(!help.classList.contains('hidden')){
+      if(!(e.ctrlKey || e.metaKey || e.altKey)){ e.preventDefault(); help.classList.add('hidden'); }
+      return;
+    }
+    if(keynavPlayerKeys(e)) return;
+    if(keynavBlocked(e)) return;
+    const tabs = keynavVisibleTabs();
+    const idx = tabs.findIndex(t => t.classList.contains('active'));
+    const k = e.key;
+    if(k === 'ArrowRight' || k === 'ArrowLeft'){
+      if(!tabs.length) return;
+      e.preventDefault();
+      const step = k === 'ArrowRight' ? 1 : -1;
+      keynavGo(tabs[(idx + step + tabs.length) % tabs.length]);
+    }else if(/^[1-9]$/.test(k)){
+      const t = tabs[parseInt(k, 10) - 1];
+      if(t){ e.preventDefault(); keynavGo(t); }
+    }else if(k === 'e' || k === 'E'){
+      e.preventDefault(); applyMode('entry');
+    }else if(k === 'd' || k === 'D'){
+      e.preventDefault(); applyMode('overview');
+    }else if(k === '/'){
+      e.preventDefault();
+      applyMode('overview');
+      keynavGo(document.querySelector('.tab[data-page="search"]'));
+      const si = document.getElementById('search-input');
+      if(si) si.focus();
+    }else if(k === '?'){
+      e.preventDefault(); help.classList.remove('hidden');
+    }
   });
 
   /* ---------- Init ---------- */
